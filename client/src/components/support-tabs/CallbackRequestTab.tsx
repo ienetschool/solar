@@ -18,6 +18,7 @@ export function CallbackRequestTab() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [referenceNumber, setReferenceNumber] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -41,12 +42,14 @@ export function CallbackRequestTab() {
     setLoading(true);
 
     try {
-      await apiRequest("POST", "/api/callbacks", formData);
+      const res = await apiRequest("POST", "/api/callbacks", formData);
+      const response = await res.json() as { id: string };
       
+      setReferenceNumber(response.id);
       setSubmitted(true);
       toast({
         title: "Callback requested",
-        description: "We'll call you back at your preferred time. Check your email for confirmation.",
+        description: `Reference: ${response.id.slice(0, 8).toUpperCase()}. We'll call you back at your preferred time.`,
       });
     } catch (error) {
       toast({
@@ -63,15 +66,25 @@ export function CallbackRequestTab() {
     return (
       <div className="flex flex-col h-[500px] justify-center items-center gap-6 px-8">
         <CheckCircle className="h-16 w-16 text-green-500" />
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-3">
           <h3 className="text-xl font-semibold">Callback Request Submitted!</h3>
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-md">
+            <p className="text-sm text-muted-foreground mb-1">Reference Number</p>
+            <p className="text-2xl font-mono font-bold text-primary" data-testid="text-reference-number">
+              {referenceNumber.slice(0, 8).toUpperCase()}
+            </p>
+          </div>
           <p className="text-muted-foreground">
-            Thank you! We'll call you back at {formData.preferredTime}. Check your email for a confirmation.
+            Thank you! We'll call you back at {formData.preferredTime}.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            A confirmation email has been sent to <strong>{formData.email}</strong> with your reference number.
           </p>
         </div>
         <Button
           onClick={() => {
             setSubmitted(false);
+            setReferenceNumber("");
             setFormData({ name: "", email: "", phone: "", preferredTime: "", reason: "" });
           }}
           data-testid="button-request-another"
