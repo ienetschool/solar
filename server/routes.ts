@@ -149,10 +149,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/tickets", async (req, res) => {
+  app.post("/api/tickets", upload.array('files', 10), async (req, res) => {
     try {
       const { userEmail, userName, userPhone, ...ticketData } = req.body;
-      const ticket = await storage.createTicket(ticketData);
+      
+      // Handle uploaded files
+      const files = req.files as Express.Multer.File[];
+      const fileUrls = files ? files.map(f => `/uploads/${f.filename}`) : [];
+      
+      const ticket = await storage.createTicket({
+        ...ticketData,
+        files: fileUrls,
+      });
       
       // Send comprehensive notifications with contact info
       const notificationService = getNotificationService(storage);
@@ -343,9 +351,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/callbacks", async (req, res) => {
+  app.post("/api/callbacks", upload.array('files', 10), async (req, res) => {
     try {
-      const request = await storage.createCallbackRequest(req.body);
+      const files = req.files as Express.Multer.File[];
+      const fileUrls = files ? files.map(f => `/uploads/${f.filename}`) : [];
+      
+      const callbackData = {
+        ...req.body,
+        files: fileUrls,
+      };
+      
+      const request = await storage.createCallbackRequest(callbackData);
       
       // Send notifications
       const notificationService = getNotificationService(storage);

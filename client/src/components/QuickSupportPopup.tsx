@@ -82,6 +82,12 @@ export function QuickSupportPopup({ open, onOpenChange, currentPage }: QuickSupp
           context: { currentPage },
         }),
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to send message');
+      }
+      
       return await response.json();
     },
     onSuccess: (data: { message: string }) => {
@@ -95,10 +101,10 @@ export function QuickSupportPopup({ open, onOpenChange, currentPage }: QuickSupp
         },
       ]);
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "Failed to send message. Please try again.",
+        description: error.message || "Failed to send message. Please try again.",
         variant: "destructive",
       });
     },
@@ -107,41 +113,89 @@ export function QuickSupportPopup({ open, onOpenChange, currentPage }: QuickSupp
   // Callback request mutation
   const callbackMutation = useMutation({
     mutationFn: async (data: typeof callbackForm) => {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+      
+      // Add uploaded files
+      uploadedFiles.forEach((file) => {
+        formData.append('files', file);
+      });
+
       const response = await fetch("/api/callbacks", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: formData,
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to submit callback request');
+      }
+      
       return await response.json();
     },
     onSuccess: (data: any) => {
       toast({
         title: "Callback Request Submitted",
-        description: `Your reference number is ${data.id}. We'll contact you soon!`,
+        description: `Your reference number is ${data.id.slice(0, 8).toUpperCase()}. We'll contact you soon!`,
       });
       setCallbackForm({ name: "", email: "", phone: "", preferredTime: "", reason: "" });
+      setUploadedFiles([]);
+      queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
       onOpenChange(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Submission Failed",
+        description: error.message || "Failed to submit callback request. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
   // Ticket creation mutation
   const ticketMutation = useMutation({
     mutationFn: async (data: typeof ticketForm) => {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+      
+      // Add uploaded files
+      uploadedFiles.forEach((file) => {
+        formData.append('files', file);
+      });
+
       const response = await fetch("/api/tickets", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: formData,
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create ticket');
+      }
+      
       return await response.json();
     },
     onSuccess: (data: any) => {
       toast({
         title: "Ticket Created",
-        description: `Your ticket #${data.id} has been created successfully.`,
+        description: `Your ticket #${data.id.slice(0, 8).toUpperCase()} has been created successfully.`,
       });
       setTicketForm({ title: "", description: "", category: "general", priority: "medium" });
+      setUploadedFiles([]);
       queryClient.invalidateQueries({ queryKey: ["/api/tickets"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
       onOpenChange(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Creation Failed",
+        description: error.message || "Failed to create ticket. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 

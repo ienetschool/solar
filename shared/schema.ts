@@ -66,6 +66,7 @@ export const callbackRequests = mysqlTable("callback_requests", {
   reason: text("reason").notNull(),
   status: text("status").notNull().default("pending"),
   notes: text("notes"),
+  files: json("files").$type<string[]>().default([]),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   contactedAt: timestamp("contacted_at"),
 });
