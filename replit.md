@@ -20,6 +20,11 @@ SolarTech is a hybrid web application combining a marketing website for a solar 
 
 ### Support System Features
 - ✅ Footer Support Buttons (Live Chat, AI Chat, WhatsApp, Email)
+- ✅ Quick Support Popup Button (global access on all pages)
+  - AI Support tab with context-aware assistance
+  - Navigation Help tab for site guidance
+  - Live Chat tab for instant support (no login required)
+  - Guest Ticket Submission tab for anonymous support requests
 - ✅ AI-powered chat with OpenAI integration (optional - gracefully degrades)
 - ✅ WebSocket live chat for real-time agent communication
 - ✅ File upload capability in chat and tickets

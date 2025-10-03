@@ -38,20 +38,20 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Services</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/services"><a className="text-muted-foreground hover:text-foreground">Residential Solar</a></Link></li>
-              <li><Link href="/services"><a className="text-muted-foreground hover:text-foreground">Commercial Solar</a></Link></li>
-              <li><Link href="/services"><a className="text-muted-foreground hover:text-foreground">Solar Maintenance</a></Link></li>
-              <li><Link href="/services"><a className="text-muted-foreground hover:text-foreground">Energy Storage</a></Link></li>
+              <li><Link href="/services" className="text-muted-foreground hover:text-foreground">Residential Solar</Link></li>
+              <li><Link href="/services" className="text-muted-foreground hover:text-foreground">Commercial Solar</Link></li>
+              <li><Link href="/services" className="text-muted-foreground hover:text-foreground">Solar Maintenance</Link></li>
+              <li><Link href="/services" className="text-muted-foreground hover:text-foreground">Energy Storage</Link></li>
             </ul>
           </div>
 
           <div>
             <h3 className="font-semibold mb-4">Company</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/about"><a className="text-muted-foreground hover:text-foreground">About Us</a></Link></li>
-              <li><Link href="/faq"><a className="text-muted-foreground hover:text-foreground">FAQ</a></Link></li>
-              <li><Link href="/contact"><a className="text-muted-foreground hover:text-foreground">Contact</a></Link></li>
-              <li><Link href="/dashboard"><a className="text-muted-foreground hover:text-foreground">Support Portal</a></Link></li>
+              <li><Link href="/about" className="text-muted-foreground hover:text-foreground">About Us</Link></li>
+              <li><Link href="/faq" className="text-muted-foreground hover:text-foreground">FAQ</Link></li>
+              <li><Link href="/contact" className="text-muted-foreground hover:text-foreground">Contact</Link></li>
+              <li><Link href="/dashboard" className="text-muted-foreground hover:text-foreground">Support Portal</Link></li>
             </ul>
           </div>
 

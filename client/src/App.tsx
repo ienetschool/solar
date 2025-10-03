@@ -66,6 +66,7 @@ function DashboardLayout() {
           </main>
         </div>
       </div>
+      <QuickSupportButton />
     </SidebarProvider>
   );
 }
@@ -87,6 +88,7 @@ function PublicLayout() {
       </main>
       <Footer />
       <AIChat />
+      <QuickSupportButton />
     </div>
   );
 }
@@ -113,7 +115,6 @@ export default function App() {
         <ThemeProvider>
           <AuthProvider>
             <Router />
-            <QuickSupportButton />
           </AuthProvider>
         </ThemeProvider>
         <Toaster />

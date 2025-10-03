@@ -8,14 +8,28 @@ export function QuickSupportButton() {
 
   return (
     <>
-      <Button
-        size="lg"
-        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg hover:shadow-xl hover-elevate"
+      <button
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 99999,
+          width: '56px',
+          height: '56px',
+          borderRadius: '50%',
+          backgroundColor: '#f97316',
+          border: 'none',
+          cursor: 'pointer',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
         onClick={() => setOpen(true)}
         data-testid="button-quick-support"
       >
-        <HelpCircle className="h-6 w-6" />
-      </Button>
+        <HelpCircle style={{ width: '24px', height: '24px', color: 'white' }} />
+      </button>
 
       <QuickSupportDialog open={open} onOpenChange={setOpen} />
     </>
