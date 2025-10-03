@@ -199,7 +199,7 @@ export const ticketsRelations = relations(tickets, ({ one, many }) => ({
     references: [users.id],
   }),
   assignedAgent: one(users, {
-    fields: [tickets.assignedTo],
+    fields: [tickets.assignedToId],
     references: [users.id],
   }),
   chatMessages: many(chatMessages),
