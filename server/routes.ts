@@ -420,6 +420,436 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Live chat session routes
+  app.get("/api/live-chat/sessions", async (req, res) => {
+    try {
+      const { status, agentId } = req.query;
+      let sessions;
+      
+      if (agentId && status) {
+        sessions = await storage.getLiveChatSessionsByAgentAndStatus(agentId as string, status as string);
+      } else if (agentId) {
+        sessions = await storage.getLiveChatSessionsByAgent(agentId as string);
+      } else if (status) {
+        sessions = await storage.getLiveChatSessionsByStatus(status as string);
+      } else {
+        sessions = await storage.getAllLiveChatSessions();
+      }
+      
+      res.json(sessions);
+    } catch (error) {
+      console.error("Get live chat sessions error:", error);
+      res.status(500).json({ message: "Failed to fetch live chat sessions" });
+    }
+  });
+
+  app.get("/api/live-chat/sessions/:id", async (req, res) => {
+    try {
+      const session = await storage.getLiveChatSession(req.params.id);
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      res.json(session);
+    } catch (error) {
+      console.error("Get live chat session error:", error);
+      res.status(500).json({ message: "Failed to fetch session" });
+    }
+  });
+
+  app.post("/api/live-chat/sessions", async (req, res) => {
+    try {
+      const session = await storage.createLiveChatSession(req.body);
+      res.json(session);
+    } catch (error) {
+      console.error("Create live chat session error:", error);
+      res.status(500).json({ message: "Failed to create session" });
+    }
+  });
+
+  app.patch("/api/live-chat/sessions/:id/status", async (req, res) => {
+    try {
+      const { status, closedAt } = req.body;
+      const session = await storage.updateLiveChatSessionStatus(req.params.id, status, closedAt);
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      res.json(session);
+    } catch (error) {
+      console.error("Update session status error:", error);
+      res.status(500).json({ message: "Failed to update session status" });
+    }
+  });
+
+  app.patch("/api/live-chat/sessions/:id/assign", async (req, res) => {
+    try {
+      const { agentId } = req.body;
+      const session = await storage.assignLiveChatToAgent(req.params.id, agentId);
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      res.json(session);
+    } catch (error) {
+      console.error("Assign session error:", error);
+      res.status(500).json({ message: "Failed to assign session" });
+    }
+  });
+
+  // Live chat message routes
+  app.get("/api/live-chat/sessions/:sessionId/messages", async (req, res) => {
+    try {
+      const messages = await storage.getLiveChatMessages(req.params.sessionId);
+      res.json(messages);
+    } catch (error) {
+      console.error("Get live chat messages error:", error);
+      res.status(500).json({ message: "Failed to fetch messages" });
+    }
+  });
+
+  app.post("/api/live-chat/messages", async (req, res) => {
+    try {
+      const message = await storage.createLiveChatMessage(req.body);
+      res.json(message);
+    } catch (error) {
+      console.error("Create live chat message error:", error);
+      res.status(500).json({ message: "Failed to create message" });
+    }
+  });
+
+  // File upload routes
+  app.get("/api/files/:id", async (req, res) => {
+    try {
+      const file = await storage.getFileUpload(req.params.id);
+      if (!file) {
+        return res.status(404).json({ message: "File not found" });
+      }
+      res.json(file);
+    } catch (error) {
+      console.error("Get file error:", error);
+      res.status(500).json({ message: "Failed to fetch file" });
+    }
+  });
+
+  app.get("/api/files", async (req, res) => {
+    try {
+      const { relatedType, relatedId } = req.query;
+      if (!relatedType || !relatedId) {
+        return res.status(400).json({ message: "relatedType and relatedId are required" });
+      }
+      const files = await storage.getFileUploadsByRelated(relatedType as string, relatedId as string);
+      res.json(files);
+    } catch (error) {
+      console.error("Get files error:", error);
+      res.status(500).json({ message: "Failed to fetch files" });
+    }
+  });
+
+  app.post("/api/files", async (req, res) => {
+    try {
+      const file = await storage.createFileUpload(req.body);
+      res.json(file);
+    } catch (error) {
+      console.error("Create file error:", error);
+      res.status(500).json({ message: "Failed to create file" });
+    }
+  });
+
+  app.delete("/api/files/:id", async (req, res) => {
+    try {
+      await storage.deleteFileUpload(req.params.id);
+      res.json({ message: "File deleted successfully" });
+    } catch (error) {
+      console.error("Delete file error:", error);
+      res.status(500).json({ message: "Failed to delete file" });
+    }
+  });
+
+  // Agent transfer routes
+  app.get("/api/transfers/:id", async (req, res) => {
+    try {
+      const transfer = await storage.getAgentTransfer(req.params.id);
+      if (!transfer) {
+        return res.status(404).json({ message: "Transfer not found" });
+      }
+      res.json(transfer);
+    } catch (error) {
+      console.error("Get transfer error:", error);
+      res.status(500).json({ message: "Failed to fetch transfer" });
+    }
+  });
+
+  app.get("/api/transfers", async (req, res) => {
+    try {
+      const { agentId } = req.query;
+      if (!agentId) {
+        return res.status(400).json({ message: "agentId is required" });
+      }
+      const transfers = await storage.getPendingTransfersByAgent(agentId as string);
+      res.json(transfers);
+    } catch (error) {
+      console.error("Get transfers error:", error);
+      res.status(500).json({ message: "Failed to fetch transfers" });
+    }
+  });
+
+  app.post("/api/transfers", async (req, res) => {
+    try {
+      const transfer = await storage.createAgentTransfer(req.body);
+      res.json(transfer);
+    } catch (error) {
+      console.error("Create transfer error:", error);
+      res.status(500).json({ message: "Failed to create transfer" });
+    }
+  });
+
+  app.patch("/api/transfers/:id/accept", async (req, res) => {
+    try {
+      const transfer = await storage.acceptAgentTransfer(req.params.id);
+      if (!transfer) {
+        return res.status(404).json({ message: "Transfer not found" });
+      }
+      res.json(transfer);
+    } catch (error) {
+      console.error("Accept transfer error:", error);
+      res.status(500).json({ message: "Failed to accept transfer" });
+    }
+  });
+
+  // Page management routes
+  app.get("/api/pages", async (req, res) => {
+    try {
+      const { published } = req.query;
+      const pages = published === "true" 
+        ? await storage.getPublishedPages()
+        : await storage.getAllPages();
+      res.json(pages);
+    } catch (error) {
+      console.error("Get pages error:", error);
+      res.status(500).json({ message: "Failed to fetch pages" });
+    }
+  });
+
+  app.get("/api/pages/:slug", async (req, res) => {
+    try {
+      const page = await storage.getPage(req.params.slug);
+      if (!page) {
+        return res.status(404).json({ message: "Page not found" });
+      }
+      res.json(page);
+    } catch (error) {
+      console.error("Get page error:", error);
+      res.status(500).json({ message: "Failed to fetch page" });
+    }
+  });
+
+  app.post("/api/pages", async (req, res) => {
+    try {
+      const page = await storage.createPage(req.body);
+      res.json(page);
+    } catch (error) {
+      console.error("Create page error:", error);
+      res.status(500).json({ message: "Failed to create page" });
+    }
+  });
+
+  app.patch("/api/pages/:id", async (req, res) => {
+    try {
+      const page = await storage.updatePage(req.params.id, req.body);
+      if (!page) {
+        return res.status(404).json({ message: "Page not found" });
+      }
+      res.json(page);
+    } catch (error) {
+      console.error("Update page error:", error);
+      res.status(500).json({ message: "Failed to update page" });
+    }
+  });
+
+  app.delete("/api/pages/:id", async (req, res) => {
+    try {
+      await storage.deletePage(req.params.id);
+      res.json({ message: "Page deleted successfully" });
+    } catch (error) {
+      console.error("Delete page error:", error);
+      res.status(500).json({ message: "Failed to delete page" });
+    }
+  });
+
+  // Page section routes
+  app.get("/api/pages/:pageId/sections", async (req, res) => {
+    try {
+      const sections = await storage.getPageSections(req.params.pageId);
+      res.json(sections);
+    } catch (error) {
+      console.error("Get page sections error:", error);
+      res.status(500).json({ message: "Failed to fetch page sections" });
+    }
+  });
+
+  app.post("/api/page-sections", async (req, res) => {
+    try {
+      const section = await storage.createPageSection(req.body);
+      res.json(section);
+    } catch (error) {
+      console.error("Create page section error:", error);
+      res.status(500).json({ message: "Failed to create page section" });
+    }
+  });
+
+  app.patch("/api/page-sections/:id", async (req, res) => {
+    try {
+      const section = await storage.updatePageSection(req.params.id, req.body);
+      if (!section) {
+        return res.status(404).json({ message: "Page section not found" });
+      }
+      res.json(section);
+    } catch (error) {
+      console.error("Update page section error:", error);
+      res.status(500).json({ message: "Failed to update page section" });
+    }
+  });
+
+  app.delete("/api/page-sections/:id", async (req, res) => {
+    try {
+      await storage.deletePageSection(req.params.id);
+      res.json({ message: "Page section deleted successfully" });
+    } catch (error) {
+      console.error("Delete page section error:", error);
+      res.status(500).json({ message: "Failed to delete page section" });
+    }
+  });
+
+  // FAQ routes
+  app.get("/api/faqs", async (req, res) => {
+    try {
+      const { category, page } = req.query;
+      let faqs;
+      
+      if (category) {
+        faqs = await storage.getFaqsByCategory(category as string);
+      } else if (page) {
+        faqs = await storage.getFaqsByPage(page as string);
+      } else {
+        faqs = await storage.getAllFaqs();
+      }
+      
+      res.json(faqs);
+    } catch (error) {
+      console.error("Get FAQs error:", error);
+      res.status(500).json({ message: "Failed to fetch FAQs" });
+    }
+  });
+
+  app.get("/api/faqs/:id", async (req, res) => {
+    try {
+      const faq = await storage.getFaq(req.params.id);
+      if (!faq) {
+        return res.status(404).json({ message: "FAQ not found" });
+      }
+      res.json(faq);
+    } catch (error) {
+      console.error("Get FAQ error:", error);
+      res.status(500).json({ message: "Failed to fetch FAQ" });
+    }
+  });
+
+  app.post("/api/faqs", async (req, res) => {
+    try {
+      const faq = await storage.createFaq(req.body);
+      res.json(faq);
+    } catch (error) {
+      console.error("Create FAQ error:", error);
+      res.status(500).json({ message: "Failed to create FAQ" });
+    }
+  });
+
+  app.patch("/api/faqs/:id", async (req, res) => {
+    try {
+      const faq = await storage.updateFaq(req.params.id, req.body);
+      if (!faq) {
+        return res.status(404).json({ message: "FAQ not found" });
+      }
+      res.json(faq);
+    } catch (error) {
+      console.error("Update FAQ error:", error);
+      res.status(500).json({ message: "Failed to update FAQ" });
+    }
+  });
+
+  app.delete("/api/faqs/:id", async (req, res) => {
+    try {
+      await storage.deleteFaq(req.params.id);
+      res.json({ message: "FAQ deleted successfully" });
+    } catch (error) {
+      console.error("Delete FAQ error:", error);
+      res.status(500).json({ message: "Failed to delete FAQ" });
+    }
+  });
+
+  // Support form routes
+  app.get("/api/support-forms", async (req, res) => {
+    try {
+      const { status } = req.query;
+      const forms = status
+        ? await storage.getSupportFormsByStatus(status as string)
+        : await storage.getAllSupportForms();
+      res.json(forms);
+    } catch (error) {
+      console.error("Get support forms error:", error);
+      res.status(500).json({ message: "Failed to fetch support forms" });
+    }
+  });
+
+  app.get("/api/support-forms/:id", async (req, res) => {
+    try {
+      const form = await storage.getSupportForm(req.params.id);
+      if (!form) {
+        return res.status(404).json({ message: "Support form not found" });
+      }
+      res.json(form);
+    } catch (error) {
+      console.error("Get support form error:", error);
+      res.status(500).json({ message: "Failed to fetch support form" });
+    }
+  });
+
+  app.post("/api/support-forms", async (req, res) => {
+    try {
+      const form = await storage.createSupportForm(req.body);
+      res.json(form);
+    } catch (error) {
+      console.error("Create support form error:", error);
+      res.status(500).json({ message: "Failed to create support form" });
+    }
+  });
+
+  app.patch("/api/support-forms/:id/status", async (req, res) => {
+    try {
+      const { status, respondedAt } = req.body;
+      const form = await storage.updateSupportFormStatus(req.params.id, status, respondedAt);
+      if (!form) {
+        return res.status(404).json({ message: "Support form not found" });
+      }
+      res.json(form);
+    } catch (error) {
+      console.error("Update support form status error:", error);
+      res.status(500).json({ message: "Failed to update support form status" });
+    }
+  });
+
+  app.patch("/api/support-forms/:id/assign", async (req, res) => {
+    try {
+      const { agentId } = req.body;
+      const form = await storage.assignSupportForm(req.params.id, agentId);
+      if (!form) {
+        return res.status(404).json({ message: "Support form not found" });
+      }
+      res.json(form);
+    } catch (error) {
+      console.error("Assign support form error:", error);
+      res.status(500).json({ message: "Failed to assign support form" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });

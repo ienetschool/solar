@@ -87,8 +87,11 @@ export interface IStorage {
 
   // Live chat session methods
   getLiveChatSession(id: string): Promise<LiveChatSession | undefined>;
+  getAllLiveChatSessions(): Promise<LiveChatSession[]>;
   getActiveLiveChatSessions(): Promise<LiveChatSession[]>;
+  getLiveChatSessionsByStatus(status: string): Promise<LiveChatSession[]>;
   getLiveChatSessionsByAgent(agentId: string): Promise<LiveChatSession[]>;
+  getLiveChatSessionsByAgentAndStatus(agentId: string, status: string): Promise<LiveChatSession[]>;
   createLiveChatSession(session: InsertLiveChatSession): Promise<LiveChatSession>;
   updateLiveChatSessionStatus(id: string, status: string, closedAt?: Date): Promise<LiveChatSession | undefined>;
   assignLiveChatToAgent(id: string, agentId: string): Promise<LiveChatSession | undefined>;
@@ -357,14 +360,33 @@ export class DatabaseStorage implements IStorage {
     return session || undefined;
   }
 
+  async getAllLiveChatSessions(): Promise<LiveChatSession[]> {
+    const db = await getDB();
+    return db.select().from(liveChatSessions).orderBy(desc(liveChatSessions.createdAt));
+  }
+
   async getActiveLiveChatSessions(): Promise<LiveChatSession[]> {
     const db = await getDB();
     return db.select().from(liveChatSessions).where(eq(liveChatSessions.status, "active")).orderBy(desc(liveChatSessions.createdAt));
   }
 
+  async getLiveChatSessionsByStatus(status: string): Promise<LiveChatSession[]> {
+    const db = await getDB();
+    return db.select().from(liveChatSessions).where(eq(liveChatSessions.status, status)).orderBy(desc(liveChatSessions.createdAt));
+  }
+
   async getLiveChatSessionsByAgent(agentId: string): Promise<LiveChatSession[]> {
     const db = await getDB();
     return db.select().from(liveChatSessions).where(eq(liveChatSessions.assignedTo, agentId)).orderBy(desc(liveChatSessions.createdAt));
+  }
+
+  async getLiveChatSessionsByAgentAndStatus(agentId: string, status: string): Promise<LiveChatSession[]> {
+    const db = await getDB();
+    return db
+      .select()
+      .from(liveChatSessions)
+      .where(and(eq(liveChatSessions.assignedTo, agentId), eq(liveChatSessions.status, status)))
+      .orderBy(desc(liveChatSessions.createdAt));
   }
 
   async createLiveChatSession(session: InsertLiveChatSession): Promise<LiveChatSession> {
