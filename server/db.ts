@@ -1,16 +1,15 @@
-import { drizzle } from 'drizzle-orm/mysql2';
-import mysql from 'mysql2/promise';
-import type { Connection } from 'mysql2/promise';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import * as schema from "@shared/schema";
 
-let connection: Connection | null = null;
+let connection: postgres.Sql | null = null;
 let db: ReturnType<typeof drizzle> | null = null;
 
 async function getConnection() {
   if (!connection && process.env.DATABASE_URL) {
     try {
-      connection = await mysql.createConnection(process.env.DATABASE_URL);
-      db = drizzle(connection, { schema, mode: 'default' });
+      connection = postgres(process.env.DATABASE_URL);
+      db = drizzle(connection, { schema });
       console.log('✅ Database connected successfully');
     } catch (error) {
       console.error('❌ Database connection failed:', error instanceof Error ? error.message : error);
