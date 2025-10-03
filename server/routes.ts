@@ -4,9 +4,16 @@ import { storage } from "./storage";
 import OpenAI from "openai";
 import { WebSocketServer, WebSocket } from "ws";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let openai: OpenAI | null = null;
+
+function getOpenAI() {
+  if (!openai && process.env.OPENAI_API_KEY) {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+}
 
 interface ChatClient {
   ws: WebSocket;
@@ -19,6 +26,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", async (req, res) => {
     try {
       const { messages } = req.body;
+      const openaiClient = getOpenAI();
+
+      if (!openaiClient) {
+        return res.status(503).json({
+          message: "AI chat is currently unavailable. OpenAI API key is not configured. Please contact our support team at (555) 123-4567.",
+        });
+      }
 
       const systemMessage = {
         role: "system",
@@ -44,7 +58,7 @@ Key company details:
 Be professional, knowledgeable, and helpful. Encourage users to schedule a free consultation or get a personalized quote for detailed information specific to their needs.`,
       };
 
-      const completion = await openai.chat.completions.create({
+      const completion = await openaiClient.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [systemMessage, ...messages],
         temperature: 0.7,
