@@ -75,7 +75,9 @@ export class DatabaseStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const db = await getDB();
-    const [user] = await db.insert(users).values(insertUser).returning();
+    const id = crypto.randomUUID();
+    await db.insert(users).values({ ...insertUser, id } as any);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
 
@@ -86,11 +88,11 @@ export class DatabaseStorage implements IStorage {
 
   async updateUserRole(id: string, role: string): Promise<User | undefined> {
     const db = await getDB();
-    const [user] = await db
+    await db
       .update(users)
       .set({ role })
-      .where(eq(users.id, id))
-      .returning();
+      .where(eq(users.id, id));
+    const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
@@ -113,37 +115,39 @@ export class DatabaseStorage implements IStorage {
 
   async createTicket(ticket: InsertTicket): Promise<Ticket> {
     const db = await getDB();
-    const [newTicket] = await db.insert(tickets).values(ticket).returning();
+    const id = crypto.randomUUID();
+    await db.insert(tickets).values({ ...ticket, id } as any);
+    const [newTicket] = await db.select().from(tickets).where(eq(tickets.id, id));
     return newTicket;
   }
 
   async updateTicketStatus(id: string, status: string, resolvedAt?: Date): Promise<Ticket | undefined> {
     const db = await getDB();
-    const [ticket] = await db
+    await db
       .update(tickets)
       .set({ status, updatedAt: new Date(), resolvedAt })
-      .where(eq(tickets.id, id))
-      .returning();
+      .where(eq(tickets.id, id));
+    const [ticket] = await db.select().from(tickets).where(eq(tickets.id, id));
     return ticket || undefined;
   }
 
   async updateTicketAssignment(id: string, assignedTo: string | null): Promise<Ticket | undefined> {
     const db = await getDB();
-    const [ticket] = await db
+    await db
       .update(tickets)
       .set({ assignedTo, updatedAt: new Date() })
-      .where(eq(tickets.id, id))
-      .returning();
+      .where(eq(tickets.id, id));
+    const [ticket] = await db.select().from(tickets).where(eq(tickets.id, id));
     return ticket || undefined;
   }
 
   async updateTicket(id: string, updates: Partial<InsertTicket>): Promise<Ticket | undefined> {
     const db = await getDB();
-    const [ticket] = await db
+    await db
       .update(tickets)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(tickets.id, id))
-      .returning();
+      .set({ ...updates, updatedAt: new Date() } as any)
+      .where(eq(tickets.id, id));
+    const [ticket] = await db.select().from(tickets).where(eq(tickets.id, id));
     return ticket || undefined;
   }
 
@@ -159,7 +163,9 @@ export class DatabaseStorage implements IStorage {
 
   async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
     const db = await getDB();
-    const [newMessage] = await db.insert(chatMessages).values(message).returning();
+    const id = crypto.randomUUID();
+    await db.insert(chatMessages).values({ ...message, id } as any);
+    const [newMessage] = await db.select().from(chatMessages).where(eq(chatMessages.id, id));
     return newMessage;
   }
 
@@ -184,17 +190,19 @@ export class DatabaseStorage implements IStorage {
 
   async createNotification(notification: InsertNotification): Promise<Notification> {
     const db = await getDB();
-    const [newNotification] = await db.insert(notifications).values(notification).returning();
+    const id = crypto.randomUUID();
+    await db.insert(notifications).values({ ...notification, id } as any);
+    const [newNotification] = await db.select().from(notifications).where(eq(notifications.id, id));
     return newNotification;
   }
 
   async markNotificationAsRead(id: string): Promise<Notification | undefined> {
     const db = await getDB();
-    const [notification] = await db
+    await db
       .update(notifications)
       .set({ isRead: true })
-      .where(eq(notifications.id, id))
-      .returning();
+      .where(eq(notifications.id, id));
+    const [notification] = await db.select().from(notifications).where(eq(notifications.id, id));
     return notification || undefined;
   }
 
@@ -218,7 +226,9 @@ export class DatabaseStorage implements IStorage {
 
   async createTicketHistory(history: InsertTicketHistory): Promise<TicketHistory> {
     const db = await getDB();
-    const [newHistory] = await db.insert(ticketHistory).values(history).returning();
+    const id = crypto.randomUUID();
+    await db.insert(ticketHistory).values({ ...history, id } as any);
+    const [newHistory] = await db.select().from(ticketHistory).where(eq(ticketHistory.id, id));
     return newHistory;
   }
 }
