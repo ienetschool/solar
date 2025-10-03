@@ -48,7 +48,7 @@ export default function SolarLogin() {
               <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
                 <Sun className="h-6 w-6 text-primary-foreground" />
               </div>
-              <span className="font-serif font-bold text-xl">SolarTech</span>
+              <span className="font-serif font-bold text-xl">Green Power Solutions</span>
             </div>
             <CardTitle className="text-2xl">Sign in to your account</CardTitle>
             <CardDescription>

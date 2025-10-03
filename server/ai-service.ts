@@ -15,206 +15,322 @@ interface ChatContext {
 class IntelligentChatbot {
   private faqDatabase: FAQItem[] = [
     {
-      question: "What is the cost of residential solar installation?",
-      answer: "Our residential solar installations start at $15,000. The final cost depends on your energy needs, roof size, and system specifications. We offer federal tax credits up to 30% and various financing options to make solar affordable. I'd recommend scheduling a free consultation for a personalized quote based on your specific situation.",
-      keywords: ["cost", "price", "residential", "home", "expensive", "how much", "pricing"],
-      category: "pricing",
+      question: "What are the benefits of switching to solar energy for my home or business?",
+      answer: "Lower energy bills, environmental sustainability, and energy independence are the key benefits of switching to solar energy.",
+      keywords: ["benefits", "advantages", "why solar", "switch"],
+      category: "general",
       context: ["home", "services"]
     },
     {
-      question: "What is the cost of commercial solar solutions?",
-      answer: "Commercial solar solutions feature custom pricing based on your business needs, facility size, and energy consumption. Our team provides comprehensive ROI analysis and financial modeling to show your potential savings. Tax incentives and rebate consultation are included. Contact us for a detailed commercial assessment.",
-      keywords: ["commercial", "business", "cost", "price", "company", "enterprise"],
-      category: "pricing",
-      context: ["services", "about"]
+      question: "How does solar energy work, and is it suitable for my property?",
+      answer: "Solar panels convert sunlight into electricity. Suitability depends on available sunlight and roof space. We can do a free assessment to determine if your property is suitable.",
+      keywords: ["how", "work", "suitable", "property", "sunlight", "roof"],
+      category: "general",
+      context: ["home", "faq"]
     },
     {
-      question: "What solar services do you offer?",
-      answer: "We offer comprehensive solar solutions including: Residential solar installation (starting at $15,000), Commercial solar systems (custom pricing), Energy storage solutions (starting at $8,500), and Maintenance plans (from $299/year). Each service includes professional installation, monitoring systems, and comprehensive warranties.",
-      keywords: ["services", "offer", "what do you", "provide", "available"],
-      category: "services",
-      context: ["home", "services"]
+      question: "What factors should I consider when deciding to go solar?",
+      answer: "Energy usage, financial incentives, and installation costs are the main factors to consider when deciding to go solar.",
+      keywords: ["factors", "consider", "decide", "think about"],
+      category: "general",
+      context: ["home", "faq"]
     },
     {
-      question: "How long does installation take?",
-      answer: "The typical timeline is 4-8 weeks from consultation to activation. This includes: Initial consultation and site assessment (1-2 days), System design and permits (1-2 weeks), Installation (2-5 days), Inspection and grid connection (1-2 weeks). We manage the entire process to ensure a smooth experience.",
-      keywords: ["installation", "timeline", "how long", "duration", "time", "when"],
+      question: "How long does it take to install a solar energy system?",
+      answer: "Typically a few days to a couple of weeks, depending on the size and complexity of the system.",
+      keywords: ["installation", "time", "how long", "duration"],
       category: "installation",
       context: ["services", "faq"]
     },
     {
-      question: "What warranties do you provide?",
-      answer: "We provide comprehensive warranty coverage: Solar panels come with a 25-year warranty, Battery storage systems have a 10-year warranty, and Installation workmanship is guaranteed for 10 years. All warranties are backed by our 15+ years of industry experience.",
-      keywords: ["warranty", "guarantee", "coverage", "protection", "defect"],
-      category: "warranty",
-      context: ["services", "faq"]
-    },
-    {
-      question: "Do you offer financing options?",
-      answer: "Yes! We offer various financing options to make solar accessible: Federal tax credits up to 30%, Flexible payment plans, Low-interest solar loans, and Lease-to-own programs. Our team will help you find the best financing solution for your budget.",
-      keywords: ["financing", "payment", "loan", "credit", "finance", "afford"],
+      question: "What financing options are available?",
+      answer: "Clients can obtain financing from their preferred financial institution - we will provide some documentation. Clients can also discuss options directly with us at our office.",
+      keywords: ["financing", "payment", "loan", "afford", "options"],
       category: "financing",
       context: ["home", "services"]
     },
     {
-      question: "How much can I save with solar?",
-      answer: "Most homeowners save 20-50% on their electricity bills. Savings depend on your current energy usage, local electricity rates, and system size. With our energy savings calculator and federal tax credits (up to 30%), many customers see ROI within 6-8 years. We provide detailed savings projections during your free consultation.",
-      keywords: ["savings", "save", "roi", "return", "benefit", "worth"],
-      category: "savings",
-      context: ["home", "services", "about"]
+      question: "How can I determine the right size of the solar system for my needs?",
+      answer: "Client may set up an inspection by contacting our office. An inspection involves our technician coming to the premises to evaluate various factors and come up with an estimated size and propose a system design.",
+      keywords: ["size", "determine", "right size", "how big", "inspection"],
+      category: "sizing",
+      context: ["services", "contact"]
     },
     {
-      question: "What is your experience and track record?",
-      answer: "SolarTech has 15+ years of experience in the solar industry with 5,000+ successful installations and 50MW total capacity installed. We're a trusted leader in both residential and commercial solar solutions, committed to quality and customer satisfaction.",
-      keywords: ["experience", "track record", "history", "reliable", "trust", "company"],
-      category: "company",
-      context: ["about", "home"]
-    },
-    {
-      question: "Do you provide maintenance services?",
-      answer: "Yes! We offer comprehensive maintenance plans starting at $299/year. This includes: Regular system inspections, Performance monitoring, Cleaning services, Priority support, and Extended warranty options. Proper maintenance ensures optimal performance and longevity.",
-      keywords: ["maintenance", "service", "repair", "cleaning", "upkeep"],
+      question: "What maintenance is required for solar panels, and how often?",
+      answer: "Minimal maintenance is required. Typically cleaning panels annually and checking for debris or shading is sufficient.",
+      keywords: ["maintenance", "cleaning", "upkeep", "service"],
       category: "maintenance",
       context: ["services", "faq"]
     },
     {
-      question: "What about energy storage solutions?",
-      answer: "Our energy storage solutions start at $8,500 and include: High-capacity battery systems, Backup power during outages, Peak demand management, Integration with solar panels, and 10-year warranty. Energy storage maximizes your solar investment and provides energy independence.",
-      keywords: ["battery", "storage", "backup", "power", "energy storage"],
-      category: "storage",
-      context: ["services", "home"]
-    },
-    {
-      question: "How do I get started?",
-      answer: "Getting started is easy! You can: 1) Schedule a free consultation using our contact form, 2) Call us at (555) 123-4567, 3) Submit a ticket through our support system, or 4) Request a personalized quote online. Our team will assess your needs and provide a custom solution.",
-      keywords: ["start", "begin", "how to", "get started", "first step", "contact"],
-      category: "getting-started",
-      context: ["home", "contact"]
-    },
-    {
-      question: "Can I monitor my solar system?",
-      answer: "Yes! All our installations include real-time monitoring systems. You can track energy production, consumption, savings, and system performance through our user-friendly dashboard. This helps you maximize efficiency and identify any issues quickly.",
-      keywords: ["monitor", "tracking", "dashboard", "app", "performance", "production"],
-      category: "monitoring",
+      question: "What warranties are offered on solar panels and installation?",
+      answer: "Typically we offer anywhere between 4 to 25 years warranties, depending on the product.",
+      keywords: ["warranty", "guarantee", "coverage"],
+      category: "warranty",
       context: ["services", "faq"]
     },
     {
-      question: "What happens during a consultation?",
-      answer: "During your free consultation, we: Assess your energy needs and usage patterns, Evaluate your property and roof condition, Design a custom solar solution, Provide detailed cost and savings projections, Explain financing and tax incentive options, and Answer all your questions. There's no obligation!",
-      keywords: ["consultation", "assessment", "evaluation", "meeting", "visit"],
-      category: "consultation",
-      context: ["contact", "services"]
+      question: "Are there any incentives or rebates available for installing solar panels?",
+      answer: "The Guyana, Power & Light offers rebates (compensation) for any excess energy produced by solar systems attached to the national grid.",
+      keywords: ["incentives", "rebates", "GPL", "GEI", "compensation"],
+      category: "incentives",
+      context: ["home", "faq"]
     },
     {
-      question: "Do you handle permits and paperwork?",
-      answer: "Absolutely! We manage all permits, paperwork, and regulatory requirements. This includes: Local building permits, Utility interconnection agreements, Federal and state incentive applications, and HOA approvals if needed. We make the process hassle-free for you.",
-      keywords: ["permit", "paperwork", "documentation", "regulations", "compliance"],
+      question: "How does solar energy impact the environment compared to traditional energy sources?",
+      answer: "Solar energy produces no greenhouse gas emissions during operation, unlike fossil fuels.",
+      keywords: ["environment", "green", "eco", "emissions", "fossil fuels"],
+      category: "environmental",
+      context: ["home", "about"]
+    },
+    {
+      question: "What is the cost for a backup system?",
+      answer: "System costs can best be determined after our technicians assess your energy needs. This is often done by an in-person inspection.",
+      keywords: ["cost", "backup", "battery", "price"],
+      category: "pricing",
+      context: ["services", "contact"]
+    },
+    {
+      question: "Is delivery available to my location?",
+      answer: "Yes, we can deliver to any location within Guyana.",
+      keywords: ["delivery", "location", "shipping", "deliver"],
+      category: "delivery",
+      context: ["services", "contact"]
+    },
+    {
+      question: "Can I expand my system later?",
+      answer: "Yes, you can. We can design and install additions to your existing system.",
+      keywords: ["expand", "addition", "upgrade", "increase"],
+      category: "expansion",
+      context: ["services", "faq"]
+    },
+    {
+      question: "Can you maintain a solar system that was either supplied or installed or both by another company?",
+      answer: "Yes, we can! We offer maintenance services for systems installed by other companies.",
+      keywords: ["maintain", "other company", "third party", "existing system"],
+      category: "maintenance",
+      context: ["services", "contact"]
+    },
+    {
+      question: "What packages do you have available?",
+      answer: "We often update our packages to give our customers the best prices. Please contact our office for package information.",
+      keywords: ["packages", "deals", "offers", "plans"],
+      category: "packages",
+      context: ["services", "contact"]
+    },
+    {
+      question: "How much will it cost to install the solar equipment?",
+      answer: "Installation costs vary depending on the size of the system and the manpower required.",
+      keywords: ["installation cost", "install price", "labor cost"],
+      category: "pricing",
+      context: ["services", "contact"]
+    },
+    {
+      question: "What documentation is required to receive rebates from GEI/GPL?",
+      answer: "None needed; we handle all documentation for you!",
+      keywords: ["documentation", "rebates", "GEI", "GPL", "paperwork"],
+      category: "incentives",
+      context: ["services", "faq"]
+    },
+    {
+      question: "How does GEI/GPL decide on compensation for surplus energy supplied to the national grid?",
+      answer: "They install a meter, and we handle the necessary documentation.",
+      keywords: ["compensation", "surplus", "grid", "GEI", "GPL", "meter"],
+      category: "incentives",
+      context: ["services", "faq"]
+    },
+    {
+      question: "Do you offer installation warranty?",
+      answer: "Yes! We offer installation warranty.",
+      keywords: ["installation warranty", "workmanship", "guarantee"],
+      category: "warranty",
+      context: ["services", "faq"]
+    },
+    {
+      question: "What services do you offer?",
+      answer: "We offer comprehensive solar solutions including design, supply, installation, and maintenance of solar systems. We provide best-in-class solar panels and battery storage with up to 30 years equipment guarantee. Delivery is available across Guyana.",
+      keywords: ["services", "what do you offer", "provide", "solutions"],
+      category: "services",
+      context: ["home", "services"]
+    },
+    {
+      question: "Tell me about the Solar Survey",
+      answer: "Our professional staff will visit your home or business and do a free assessment of your building and energy demands and design a system to match your needs.",
+      keywords: ["survey", "assessment", "evaluation", "free visit"],
+      category: "consultation",
+      context: ["services", "contact"]
+    },
+    {
+      question: "How does the installation process work?",
+      answer: "After assessing your needs and getting the best equipment, our staff will install the system as designed and in the time that is given to our customers.",
+      keywords: ["installation process", "how install", "procedure"],
       category: "installation",
       context: ["services", "faq"]
     },
     {
-      question: "What if I need support after installation?",
-      answer: "We provide comprehensive post-installation support: 24/7 monitoring and alerts, Dedicated customer support team, Regular maintenance check-ups, Priority service for issues, and Lifetime technical assistance. Your satisfaction is our priority!",
-      keywords: ["support", "help", "assistance", "after", "post", "problem"],
-      category: "support",
-      context: ["contact", "faq"]
+      question: "Do you provide maintenance after installation?",
+      answer: "Yes, after completion of the system, we will continue monitoring your system to ensure that it is running smoothly.",
+      keywords: ["after installation", "post install", "monitoring", "ongoing"],
+      category: "maintenance",
+      context: ["services", "faq"]
+    },
+    {
+      question: "How do I get started or contact you?",
+      answer: "Getting started is easy! You can: 1) Schedule a free consultation using our contact form, 2) Submit a quote request, or 3) Request a personalized assessment online. Our team will assess your needs and provide a custom solution.",
+      keywords: ["start", "begin", "contact", "get started", "reach you"],
+      category: "getting-started",
+      context: ["home", "contact"]
     }
   ];
 
   private greetings = [
-    "Hello! I'm your SolarTech AI assistant. How can I help you today?",
-    "Hi there! I'm here to answer your questions about solar energy. What would you like to know?",
-    "Welcome to SolarTech! I can help you with information about our solar services. What's on your mind?"
+    "Hello! I'm your Green Power Solutions AI assistant. How can I help you today?",
+    "Welcome to Green Power Solutions! I'm here to answer your solar energy questions.",
+    "Hi there! I'm the Green Power Solutions AI assistant. What would you like to know about solar energy?",
+    "Greetings! I'm here to help you learn about our solar solutions. What can I assist you with?",
   ];
 
-  private contextualGreetings: { [key: string]: string } = {
-    "home": "Welcome to SolarTech! I see you're on our home page. I can help you learn about our solar solutions and services. What interests you?",
-    "services": "I see you're exploring our services! I can provide details about residential installation, commercial solutions, energy storage, or maintenance. What would you like to know?",
-    "about": "Thanks for wanting to learn more about us! I can share information about our 15+ years of experience, our track record, or our mission. What interests you?",
-    "contact": "I'm here to help you get in touch! Would you like to schedule a consultation, get a quote, or ask questions about our services?",
-    "faq": "I see you're looking for answers! I have detailed information about our services, pricing, installation process, and more. What question can I help with?"
-  };
-
-  private fallbackResponses = [
-    "That's a great question! For detailed information specific to your situation, I'd recommend: 1) Scheduling a free consultation with our team, 2) Calling us at (555) 123-4567, or 3) Submitting a support ticket. Our experts can provide personalized guidance.",
-    "I want to make sure you get accurate information. Could you rephrase your question or ask about: our services, pricing, installation process, warranties, or financing options? I'm also happy to connect you with a specialist.",
-    "While I may not have that exact information, I can help you with: solar costs, installation timelines, energy savings, financing options, or warranty details. Or I can help you contact our team directly for personalized assistance."
-  ];
-
-  public getGreeting(context?: ChatContext): string {
-    if (context?.currentPage && this.contextualGreetings[context.currentPage]) {
-      return this.contextualGreetings[context.currentPage];
-    }
+  private getRandomGreeting(): string {
     return this.greetings[Math.floor(Math.random() * this.greetings.length)];
   }
 
-  public findBestMatch(userMessage: string, context?: ChatContext): string {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    const scores = this.faqDatabase.map(faq => {
-      let score = 0;
-      
-      faq.keywords.forEach(keyword => {
-        if (lowerMessage.includes(keyword.toLowerCase())) {
-          score += 10;
-        }
-      });
-      
-      if (context?.currentPage && faq.context?.includes(context.currentPage)) {
-        score += 5;
+  private calculateRelevance(query: string, faq: FAQItem, context?: string): number {
+    const queryLower = query.toLowerCase();
+    let relevanceScore = 0;
+
+    if (context && faq.context?.includes(context)) {
+      relevanceScore += 20;
+    }
+
+    const questionWords = faq.question.toLowerCase().split(' ');
+    const queryWords = queryLower.split(' ');
+
+    for (const queryWord of queryWords) {
+      if (queryWord.length < 3) continue;
+
+      if (faq.question.toLowerCase().includes(queryWord)) {
+        relevanceScore += 15;
       }
-      
-      const questionWords = faq.question.toLowerCase().split(' ');
-      const messageWords = lowerMessage.split(' ');
-      questionWords.forEach(word => {
-        if (messageWords.includes(word) && word.length > 3) {
-          score += 2;
+
+      for (const keyword of faq.keywords) {
+        if (keyword.includes(queryWord) || queryWord.includes(keyword)) {
+          relevanceScore += 10;
         }
-      });
-      
-      return { faq, score };
-    });
+      }
 
-    scores.sort((a, b) => b.score - a.score);
-    
-    if (scores[0].score > 8) {
-      return scores[0].faq.answer;
+      for (const questionWord of questionWords) {
+        if (questionWord.includes(queryWord) || queryWord.includes(questionWord)) {
+          relevanceScore += 5;
+        }
+      }
     }
 
-    if (this.isGreeting(lowerMessage)) {
-      return this.getGreeting(context);
+    const exactKeywordMatch = faq.keywords.some(keyword => 
+      queryLower.includes(keyword) || keyword.includes(queryLower)
+    );
+    if (exactKeywordMatch) {
+      relevanceScore += 25;
     }
 
-    if (this.isThankYou(lowerMessage)) {
-      return "You're welcome! Is there anything else I can help you with about our solar services?";
+    return relevanceScore;
+  }
+
+  findBestMatch(userQuery: string, context?: string): string {
+    const queryLower = userQuery.toLowerCase();
+
+    const greetingPatterns = [
+      /^(hi|hello|hey|greetings|good (morning|afternoon|evening))/i,
+      /^(what's up|how are you|howdy)/i,
+    ];
+
+    if (greetingPatterns.some(pattern => pattern.test(queryLower))) {
+      return this.getRandomGreeting();
     }
 
-    return this.fallbackResponses[Math.floor(Math.random() * this.fallbackResponses.length)];
-  }
-
-  private isGreeting(message: string): boolean {
-    const greetingPatterns = ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'];
-    return greetingPatterns.some(pattern => message.includes(pattern));
-  }
-
-  private isThankYou(message: string): boolean {
-    const thankYouPatterns = ['thank', 'thanks', 'appreciate'];
-    return thankYouPatterns.some(pattern => message.includes(pattern));
-  }
-
-  public getFAQsByCategory(category?: string): FAQItem[] {
-    if (category) {
-      return this.faqDatabase.filter(faq => faq.category === category);
+    let contextValue = context;
+    if (!contextValue) {
+      if (queryLower.includes('home') || queryLower.includes('residential')) {
+        contextValue = 'home';
+      } else if (queryLower.includes('service')) {
+        contextValue = 'services';
+      } else if (queryLower.includes('contact') || queryLower.includes('reach')) {
+        contextValue = 'contact';
+      } else if (queryLower.includes('about') || queryLower.includes('company')) {
+        contextValue = 'about';
+      } else if (queryLower.includes('faq') || queryLower.includes('question')) {
+        contextValue = 'faq';
+      }
     }
-    return this.faqDatabase;
+
+    const scoredFAQs = this.faqDatabase.map(faq => ({
+      faq,
+      score: this.calculateRelevance(userQuery, faq, contextValue),
+    }));
+
+    scoredFAQs.sort((a, b) => b.score - a.score);
+
+    if (scoredFAQs[0].score > 10) {
+      return scoredFAQs[0].faq.answer;
+    }
+
+    return "I'd be happy to help you with that! For specific information about our solar solutions in Guyana, please contact our office. You can also schedule a free consultation, and our team will assess your needs and provide a custom solution. What else would you like to know about solar energy?";
   }
 
-  public getFAQsByContext(context: string): FAQItem[] {
+  getContextSuggestion(pageOrRef: string): {
+    suggestion?: string;
+    service?: string;
+    message?: string;
+  } {
+    const suggestions: Record<string, { suggestion?: string; service?: string; message?: string }> = {
+      '/': {
+        suggestion: "I see you're interested in our solar solutions!",
+        service: "general",
+        message: "I'm interested in learning more about solar energy solutions for my property."
+      },
+      '/services': {
+        suggestion: "Looking to explore our solar services?",
+        service: "installation",
+        message: "I'd like to know more about your solar installation services and packages."
+      },
+      '/about': {
+        suggestion: "Want to learn more about Green Power Solutions?",
+        service: "general",
+        message: "I'd like to learn more about Green Power Solutions and your experience in Guyana."
+      },
+      '/contact': {
+        suggestion: "Ready to start your solar journey?",
+        service: "consultation",
+        message: "I'm interested in scheduling a free solar assessment for my property."
+      },
+      '/faq': {
+        suggestion: "Have a question not answered in our FAQ?",
+        service: "general",
+        message: "I have some questions about solar energy systems."
+      }
+    };
+
+    return suggestions[pageOrRef] || {
+      suggestion: "How can we help you go solar?",
+      service: "general",
+      message: "I'm interested in your solar energy solutions."
+    };
+  }
+
+  getFAQsByContext(context: string): FAQItem[] {
     return this.faqDatabase.filter(faq => faq.context?.includes(context));
   }
 
-  public getCategories(): string[] {
-    return Array.from(new Set(this.faqDatabase.map(faq => faq.category)));
+  getFAQsByCategory(category?: string): FAQItem[] {
+    if (!category) {
+      return this.faqDatabase;
+    }
+    return this.faqDatabase.filter(faq => faq.category === category);
+  }
+
+  getCategories(): string[] {
+    const categories = new Set(this.faqDatabase.map(faq => faq.category));
+    return Array.from(categories);
   }
 }
 

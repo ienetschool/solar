@@ -29,9 +29,9 @@ export default function About() {
     <div className="min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h1 className="font-serif font-bold text-5xl mb-4">About SolarTech</h1>
+          <h1 className="font-serif font-bold text-5xl mb-4">About Green Power Solutions</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Leading the solar revolution since 2010
+            Your Premier Solar Energy Solution Provider in Guyana
           </p>
         </div>
 
@@ -43,13 +43,13 @@ export default function About() {
               </h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  Founded in 2010, SolarTech has been at the forefront of the renewable energy revolution. What started as a small team of passionate engineers has grown into one of the most trusted solar installation companies in the nation.
+                  Green Power Solutions is a trusted leader in renewable energy in Guyana. We offer end-to-end services, including design, supply, installation, and maintenance, backed by experienced professionals for seamless transitions to solar power.
                 </p>
                 <p>
-                  With over 5,000 successful installations and counting, we've helped homeowners and businesses across the country reduce their carbon footprint while saving significantly on energy costs. Our commitment to quality, innovation, and customer satisfaction has earned us numerous industry awards and, more importantly, the trust of our clients.
+                  With a proven track record of successful projects and satisfied customers across Guyana, we've helped homeowners and businesses reduce their carbon footprint while saving significantly on energy costs. Our customized solutions match individual energy needs and goals, prioritizing efficiency, savings, and environmental responsibility.
                 </p>
                 <p>
-                  We believe that clean energy should be accessible to everyone. That's why we offer flexible financing options, comprehensive warranties, and ongoing support to ensure your solar investment delivers maximum value for decades to come.
+                  We believe that clean energy should be accessible to everyone. That's why we provide comprehensive warranties (4 to 25 years depending on the product), flexible financing options, and ongoing support to ensure your solar investment delivers maximum value for decades to come.
                 </p>
               </div>
             </div>

@@ -1,7 +1,11 @@
 import { Link } from "wouter";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Home as HomeIcon,
   Building2,
@@ -13,6 +17,9 @@ import {
   Users,
   Award,
   ArrowRight,
+  FileText,
+  Lightbulb,
+  Shield,
 } from "lucide-react";
 import {
   Accordion,
@@ -23,63 +30,149 @@ import {
 import { FAQWidget } from "@/components/FAQWidget";
 
 export default function Home() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    ownHome: "yes"
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Quote form submitted:", formData);
+  };
+
+  const whyChooseUs = [
+    {
+      icon: Award,
+      title: "Efficiency & Expertise",
+      description: "We offer end-to-end services, including design, supply, installation, and maintenance, backed by experienced professionals in renewable energy for seamless transitions to solar power.",
+    },
+    {
+      icon: Lightbulb,
+      title: "Customized Solutions",
+      description: "Our solar solutions are customized to match individual energy needs and goals, prioritizing efficiency, savings, and environmental responsibility for a tailored renewable energy solution.",
+    },
+    {
+      icon: Shield,
+      title: "Proven Track Record",
+      description: "Trusted leader in renewable energy, with a track record of successful projects and satisfied customers, providing reliability and confidence to businesses and households embarking on their solar journey.",
+    },
+  ];
+
   const services = [
     {
-      icon: HomeIcon,
-      title: "Residential Solar",
-      description: "Transform your home with clean, renewable energy. Save on electricity bills while reducing your carbon footprint.",
+      icon: FileText,
+      title: "Best-in-class solar panels and battery storage",
+      description: "Premium equipment for optimal performance",
     },
     {
-      icon: Building2,
-      title: "Commercial Solar",
-      description: "Power your business with sustainable energy solutions. Maximize ROI with tax incentives and energy savings.",
+      icon: Shield,
+      title: "Up to 30 Years equipment guarantee",
+      description: "Long-term protection for your investment",
     },
     {
-      icon: Wrench,
-      title: "Solar Maintenance",
-      description: "Keep your system running at peak performance with our expert maintenance and monitoring services.",
-    },
-    {
-      icon: Battery,
-      title: "Energy Storage",
-      description: "Store excess energy and ensure power availability 24/7 with our advanced battery storage solutions.",
+      icon: TrendingUp,
+      title: "Delivery across Guyana",
+      description: "We deliver to any location within Guyana",
     },
   ];
 
-  const stats = [
-    { value: "5,000+", label: "Installations", icon: Sun },
-    { value: "50MW", label: "Total Capacity", icon: TrendingUp },
-    { value: "10,000+", label: "Happy Clients", icon: Users },
-    { value: "15+", label: "Years Experience", icon: Award },
-  ];
-
-  const steps = [
-    { title: "Consultation", description: "Free assessment of your energy needs and site evaluation" },
-    { title: "Custom Design", description: "Tailored solar system design optimized for your property" },
-    { title: "Installation", description: "Professional installation by certified technicians" },
-    { title: "Activation", description: "System activation and ongoing monitoring support" },
+  const howWeWork = [
+    {
+      title: "Solar Survey",
+      description: "Our professional staff will visit your home or business and do a free assessment of your building and energy demands and design a system to match your needs.",
+      image: "https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?w=400",
+    },
+    {
+      title: "Solar Installation",
+      description: "After assessing your needs and getting the best equipment, our staff will install the system as designed and in the time that is given to our customers.",
+      image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400",
+    },
+    {
+      title: "Maintenance",
+      description: "After completion of the system, we will continue monitoring your system to ensure that it is running smoothly.",
+      image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400",
+    },
   ];
 
   const faqs = [
     {
-      question: "How much can I save with solar panels?",
-      answer: "Most homeowners save 40-70% on their electricity bills. The exact savings depend on your location, system size, and energy consumption. Our team provides detailed savings estimates during the consultation.",
+      question: "What are the benefits of switching to solar energy for my home or business?",
+      answer: "Lower energy bills, environmental sustainability, and energy independence.",
     },
     {
-      question: "What incentives are available?",
-      answer: "Federal tax credits cover up to 30% of installation costs. Many states offer additional rebates and incentives. We help you navigate all available programs to maximize your savings.",
+      question: "How does solar energy work, and is it suitable for my property?",
+      answer: "Solar panels convert sunlight into electricity; suitability depends on available sunlight and roof space.",
     },
     {
-      question: "How long does installation take?",
-      answer: "Most residential installations are completed in 1-3 days. Commercial projects vary based on size. The entire process from consultation to activation typically takes 4-8 weeks.",
+      question: "What factors should I consider when deciding to go solar?",
+      answer: "Energy usage, financial incentives, and installation costs.",
     },
     {
-      question: "What maintenance is required?",
-      answer: "Solar panels require minimal maintenance. We recommend annual inspections and occasional cleaning. Our monitoring system alerts you to any performance issues.",
+      question: "How long does it take to install a solar energy system?",
+      answer: "Typically a few days to a couple of weeks, depending on the size and complexity.",
     },
     {
-      question: "Do solar panels work on cloudy days?",
-      answer: "Yes! Solar panels still generate electricity on cloudy days, though at reduced efficiency. Modern panels are highly efficient and can produce power even in diffuse light conditions.",
+      question: "What financing options are available?",
+      answer: "Clients can obtain financing from their preferred financial institution- we will provide some documentation. Clients can also discuss options directly with us at our office.",
+    },
+    {
+      question: "How can I determine the right size of the solar system for my needs?",
+      answer: "Client may set up an inspection by contacting our office. An inspection involves our technician coming to the premises to evaluate various factors and come up with an estimated size and propose a system design.",
+    },
+    {
+      question: "What maintenance is required for solar panels, and how often?",
+      answer: "Minimal maintenance, typically cleaning panels annually and checking for debris or shading.",
+    },
+    {
+      question: "What warranties are offered on solar panels and installation?",
+      answer: "Typically we offer anywhere between 4 to 25 years warranties, depending on the product.",
+    },
+    {
+      question: "Are there any incentives or rebates available for installing solar panels?",
+      answer: "The Guyana, Power & Light offers rebates (compensation) for any excess energy produced by solar systems attached to the national grid.",
+    },
+    {
+      question: "How does solar energy impact the environment compared to traditional energy sources?",
+      answer: "Solar energy produces no greenhouse gas emissions during operation, unlike fossil fuels.",
+    },
+    {
+      question: "What is the cost for a backup system?",
+      answer: "System costs can best be determined after our technicians assess your energy needs. This is often done by an in-person inspection.",
+    },
+    {
+      question: "Is delivery available to my location?",
+      answer: "Yes, we can deliver to any location within Guyana.",
+    },
+    {
+      question: "Can I expand my system later?",
+      answer: "Yes, you can. We can design and install additions to your existing system",
+    },
+    {
+      question: "Can you maintain a solar system that was either supplied or installed or both by another company?",
+      answer: "Yes, we can!",
+    },
+    {
+      question: "What packages do you have available?",
+      answer: "We often update our packages to give our customers the best prices. Please contact our office for package information.",
+    },
+    {
+      question: "How much will it cost to install the solar equipment?",
+      answer: "Installation costs vary depending on the size of the system and the manpower required.",
+    },
+    {
+      question: "What documentation is required to receive rebates from GEI/GPL?",
+      answer: "None needed; we handle all documentation for you!",
+    },
+    {
+      question: "How does GEI/GPL decide on compensation for surplus energy supplied to the national grid?",
+      answer: "They install a meter, and we handle the necessary documentation.",
+    },
+    {
+      question: "Do you offer installation warranty?",
+      answer: "Yes!",
     },
   ];
 
@@ -89,23 +182,23 @@ export default function Home() {
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1920')] bg-cover bg-center opacity-10" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <Badge className="mb-6 bg-primary/10 text-primary border-primary/20" variant="outline">
-            Powering a Sustainable Future
+            Empowering Tomorrow
           </Badge>
           <h1 className="font-serif font-bold text-5xl md:text-6xl lg:text-7xl mb-6">
-            Transform Your Energy
+            Your Solar Energy
             <br />
-            <span className="text-primary">with Solar Power</span>
+            <span className="text-primary">Solution Provider</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-            Join thousands of homeowners and businesses making the switch to clean, renewable energy. Save money while protecting the planet.
+            Elevate Your Energy: Premium Renewable Solutions for Homes & Businesses in Guyana
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/contact">
+            <a href="#quote">
               <Button size="lg" className="text-lg px-8" data-testid="button-get-quote">
                 Get Free Quote
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-            </Link>
+            </a>
             <Link href="/services">
               <Button size="lg" variant="outline" className="text-lg px-8 backdrop-blur bg-background/50" data-testid="button-learn-more">
                 Learn More
@@ -118,12 +211,125 @@ export default function Home() {
       <section className="py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="font-serif font-bold text-4xl mb-4">Our Services</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive solar solutions tailored to your needs
+            <h2 className="font-serif font-bold text-4xl mb-4">Why choose us</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {whyChooseUs.map((item) => (
+              <Card key={item.title} className="hover-elevate transition-transform">
+                <CardContent className="p-8 text-center">
+                  <div className="h-16 w-16 rounded-lg bg-primary/10 flex items-center justify-center mb-4 mx-auto">
+                    <item.icon className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-xl mb-3">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="quote" className="py-20 bg-gradient-to-br from-secondary/5 to-primary/5">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="font-serif font-bold text-4xl mb-4">Elevate Your Energy: Premium Renewable Solutions for Homes & Businesses</h2>
+            <p className="text-xl text-muted-foreground">Get a free personalized quote</p>
+          </div>
+          <Card>
+            <CardContent className="p-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <Label htmlFor="name">Your name</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Enter your name"
+                    required
+                    data-testid="input-name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email">Your email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="Enter your email"
+                    required
+                    data-testid="input-email"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="Enter your phone number"
+                    required
+                    data-testid="input-phone"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder="Enter your address"
+                    required
+                    data-testid="input-address"
+                  />
+                </div>
+                <div>
+                  <Label>Do you own your own home?</Label>
+                  <RadioGroup
+                    value={formData.ownHome}
+                    onValueChange={(value) => setFormData({ ...formData, ownHome: value })}
+                    className="flex gap-4 mt-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="yes" id="yes" data-testid="radio-yes" />
+                      <Label htmlFor="yes" className="font-normal cursor-pointer">Yes</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="no" id="no" data-testid="radio-no" />
+                      <Label htmlFor="no" className="font-normal cursor-pointer">No</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  By clicking below, I authorize Green Power Solutions Inc. to call me and send pre-recorded messages and text messages to me about warranty products and services at the telephone number. I agree to our Terms of Service.
+                </p>
+                <Button type="submit" size="lg" className="w-full" data-testid="button-submit-quote">
+                  Submit Quote Request
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+          <div className="text-center mt-8">
+            <p className="text-muted-foreground">
+              Have Questions?{" "}
+              <a href="#quote" className="text-primary hover:underline font-semibold">
+                Talk to one of our experts
+              </a>
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="font-serif font-bold text-4xl mb-4">High tech. Hassle free.</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              From installation to maintenance, enjoy an effortless and affordable solar experience with the warranty plan solar lease.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
             {services.map((service) => (
               <Card key={service.title} className="hover-elevate transition-transform">
                 <CardContent className="p-6">
@@ -136,40 +342,36 @@ export default function Home() {
               </Card>
             ))}
           </div>
+          <div className="text-center">
+            <Link href="/contact">
+              <Button size="lg" data-testid="button-get-in-touch">
+                Get in Touch
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="py-20">
+      <section className="py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="font-serif font-bold text-4xl mb-4">How It Works</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Simple steps to solar energy independence
-            </p>
+            <h2 className="font-serif font-bold text-4xl mb-4">How we work</h2>
           </div>
-          <div className="grid md:grid-cols-4 gap-8">
-            {steps.map((step, index) => (
-              <div key={step.title} className="text-center">
-                <div className="h-16 w-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                  {index + 1}
+          <div className="grid md:grid-cols-3 gap-8">
+            {howWeWork.map((step) => (
+              <Card key={step.title} className="hover-elevate transition-transform overflow-hidden">
+                <div className="h-48 overflow-hidden">
+                  <img
+                    src={step.image}
+                    alt={step.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
-                <p className="text-sm text-muted-foreground">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 bg-primary text-primary-foreground">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            {stats.map((stat) => (
-              <div key={stat.label}>
-                <stat.icon className="h-8 w-8 mx-auto mb-3 opacity-90" />
-                <div className="text-4xl font-bold mb-2">{stat.value}</div>
-                <div className="text-sm opacity-90">{stat.label}</div>
-              </div>
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-xl mb-3">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
@@ -178,10 +380,7 @@ export default function Home() {
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="font-serif font-bold text-4xl mb-4">Frequently Asked Questions</h2>
-            <p className="text-muted-foreground">
-              Get answers to common questions about solar energy
-            </p>
+            <h2 className="font-serif font-bold text-4xl mb-4">FAQs</h2>
           </div>
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, index) => (
@@ -206,9 +405,9 @@ export default function Home() {
 
       <section className="py-20 bg-gradient-to-br from-primary via-primary/90 to-secondary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-serif font-bold text-4xl mb-4">Ready to Go Solar?</h2>
+          <h2 className="font-serif font-bold text-4xl mb-4">Have Questions?</h2>
           <p className="text-xl mb-8 opacity-90">
-            Get a free consultation and personalized quote today
+            Talk to one of our experts
           </p>
           <Link href="/contact">
             <Button size="lg" variant="secondary" className="text-lg px-8">

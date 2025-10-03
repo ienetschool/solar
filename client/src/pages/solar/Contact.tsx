@@ -69,7 +69,7 @@ export default function Contact() {
         <div className="text-center mb-12">
           <h1 className="font-serif font-bold text-5xl mb-4">Get in Touch</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Ready to start your solar journey? Contact us for a free consultation and quote
+            Ready to start your solar journey in Guyana? Contact us for a free consultation and personalized quote
           </p>
         </div>
 

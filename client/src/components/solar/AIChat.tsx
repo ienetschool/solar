@@ -17,7 +17,7 @@ export function AIChat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm your SolarTech AI assistant. I can help you with information about our solar products, services, pricing, and answer any questions you have about going solar. How can I assist you today?",
+      content: "Hello! I'm your Green Power Solutions AI assistant. I can help you with information about our solar products, services, pricing, and answer any questions you have about going solar in Guyana. How can I assist you today?",
       role: "assistant",
       timestamp: new Date(),
     },

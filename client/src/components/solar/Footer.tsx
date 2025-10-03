@@ -14,10 +14,10 @@ export function Footer() {
               <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center">
                 <Sun className="h-6 w-6 text-primary-foreground" />
               </div>
-              <span className="font-serif font-bold text-xl">SolarTech</span>
+              <span className="font-serif font-bold text-xl">Green Power Solutions</span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Empowering homes and businesses with sustainable solar energy solutions since 2010.
+              Empowering tomorrow with sustainable solar energy solutions for homes and businesses across Guyana.
             </p>
             <div className="flex gap-2">
               <Button variant="outline" size="icon" className="h-8 w-8">
@@ -60,15 +60,15 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                <span className="text-muted-foreground">123 Solar Street, Green City, CA 90210</span>
+                <span className="text-muted-foreground">Guyana</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">(555) 123-4567</span>
+                <span className="text-muted-foreground">Contact Us</span>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">info@solartech.com</span>
+                <span className="text-muted-foreground">info@greenpowersolutions.co</span>
               </li>
             </ul>
           </div>
@@ -82,7 +82,7 @@ export function Footer() {
 
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">
-              © 2024 SolarTech. All rights reserved.
+              © 2024 Green Power Solutions. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-muted-foreground">
               <a href="#" className="hover:text-foreground">Privacy Policy</a>
