@@ -1,9 +1,9 @@
 import { sql, relations } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, json } from "drizzle-orm/pg-core";
+import { mysqlTable, text, varchar, timestamp, boolean, json } from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
+export const users = mysqlTable("users", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
@@ -12,7 +12,7 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const tickets = pgTable("tickets", {
+export const tickets = mysqlTable("tickets", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
   title: text("title").notNull(),
@@ -27,7 +27,7 @@ export const tickets = pgTable("tickets", {
   resolvedAt: timestamp("resolved_at"),
 });
 
-export const chatMessages = pgTable("chat_messages", {
+export const chatMessages = mysqlTable("chat_messages", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   ticketId: varchar("ticket_id", { length: 36 }).references(() => tickets.id),
   userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
@@ -37,7 +37,7 @@ export const chatMessages = pgTable("chat_messages", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const notifications = pgTable("notifications", {
+export const notifications = mysqlTable("notifications", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
   title: text("title").notNull(),
@@ -48,7 +48,7 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const ticketHistory = pgTable("ticket_history", {
+export const ticketHistory = mysqlTable("ticket_history", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   ticketId: varchar("ticket_id", { length: 36 }).notNull().references(() => tickets.id),
   userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
@@ -57,7 +57,7 @@ export const ticketHistory = pgTable("ticket_history", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const callbackRequests = pgTable("callback_requests", {
+export const callbackRequests = mysqlTable("callback_requests", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
   email: text("email").notNull(),
