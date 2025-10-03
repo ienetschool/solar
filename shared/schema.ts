@@ -1,10 +1,10 @@
 import { sql, relations } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, integer, json } from "drizzle-orm/pg-core";
+import { mysqlTable, text, varchar, timestamp, boolean, json } from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+export const users = mysqlTable("users", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email").notNull().unique(),
@@ -12,46 +12,46 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const tickets = pgTable("tickets", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id),
+export const tickets = mysqlTable("tickets", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
   title: text("title").notNull(),
   description: text("description").notNull(),
   status: text("status").notNull().default("open"),
   priority: text("priority").notNull().default("medium"),
   category: text("category").notNull(),
-  assignedTo: varchar("assigned_to").references(() => users.id),
+  assignedTo: varchar("assigned_to", { length: 36 }).references(() => users.id),
   files: json("files").$type<string[]>().default([]),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
   resolvedAt: timestamp("resolved_at"),
 });
 
-export const chatMessages = pgTable("chat_messages", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  ticketId: varchar("ticket_id").references(() => tickets.id),
-  userId: varchar("user_id").notNull().references(() => users.id),
+export const chatMessages = mysqlTable("chat_messages", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  ticketId: varchar("ticket_id", { length: 36 }).references(() => tickets.id),
+  userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
   message: text("message").notNull(),
   isAgent: boolean("is_agent").notNull().default(false),
   files: json("files").$type<string[]>().default([]),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const notifications = pgTable("notifications", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id),
+export const notifications = mysqlTable("notifications", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
   title: text("title").notNull(),
   message: text("message").notNull(),
   type: text("type").notNull(),
   isRead: boolean("is_read").notNull().default(false),
-  relatedId: varchar("related_id"),
+  relatedId: varchar("related_id", { length: 36 }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const ticketHistory = pgTable("ticket_history", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  ticketId: varchar("ticket_id").notNull().references(() => tickets.id),
-  userId: varchar("user_id").notNull().references(() => users.id),
+export const ticketHistory = mysqlTable("ticket_history", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  ticketId: varchar("ticket_id", { length: 36 }).notNull().references(() => tickets.id),
+  userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
   action: text("action").notNull(),
   details: json("details").$type<Record<string, any>>(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
