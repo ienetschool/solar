@@ -1,0 +1,53 @@
+Redesign the Quick Support popup to be fully responsive and implement the following features:
+
+1. AI-Powered Live Chat:
+   - Users first interact with an AI assistant to select services/products or get general website information
+   - Seamless handoff to available live agents when requested
+   - All chat conversations and file uploads should be stored for future reference
+- chat with live agent and if agent not able to sove that query then then can genrate callback request that should be option in chat using button  and arrage infomation as per chat and AI also can edint manually also same thing for ticket genrate system alsong with refrance number for both and attachment and noticiation. 
+
+Comprehensive Support Features:
+   - AI chatbot for initial assistance
+   - Live agent support when needed
+   - Callback option
+   - Ticket system with file/photo attachments
+   - Complete process tracking at all stages
+
+Ticket Management:
+   - Agents can create tickets from chats when needed
+   - Each ticket generates a unique reference number
+   - Automatic notifications via email and WhatsApp to:
+     * User
+     * Support team
+     * Backend system
+   - Real-time updates on ticket status changes
+   - Notifications sent to all relevant parties (user, assigned agent, team members)
+
+Callback System:
+   - Users can request callbacks
+   - Generates reference number for tracking
+   - Stores all information and file attachments in backend
+   - Provides status updates and notifications
+
+
+Unified Management:
+   - All processes recorded in both:
+     * Backend portal
+     * User panel
+   - Full audit trail of all actions and stages
+
+- Build a notification system with push updates delivered via in-app messages, emails, and WhatsApp for both customers and internal users
+
+Design a comprehensive portal with modules for managing:
+• Live chat operations including File/document management as per user login who have role to chat with users
+• Ticket management workflows manage with role as access 
+• Page/content management
+• Support systems configuration
+• User management /customer administration
+• Notification systems
+• File/document management
+• All essential support system functionalities
+•  All sttings including role, notification and all other 
+• remove query form from home page and create button that use as popup for quick support and same for other pages as well
+
+make sure we are using mysql databse
