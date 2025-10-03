@@ -1,8 +1,11 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { intelligentChatbot } from "./ai-service";
 import { WebSocketServer, WebSocket } from "ws";
+import multer from "multer";
+import path from "path";
+import { nanoid } from "nanoid";
 
 interface ChatClient {
   ws: WebSocket;
@@ -10,6 +13,35 @@ interface ChatClient {
   username: string;
   isAgent: boolean;
 }
+
+const uploadStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(process.cwd(), 'public/uploads'));
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${nanoid()}-${file.originalname}`;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({
+  storage: uploadStorage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Allow images and common document types
+    const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|txt|xls|xlsx/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only images and documents are allowed.'));
+    }
+  }
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", async (req, res) => {
@@ -543,9 +575,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/files", async (req, res) => {
+  app.post("/api/files", upload.single('file'), async (req, res) => {
     try {
-      const file = await storage.createFileUpload(req.body);
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const { uploadedBy, relatedType, relatedId } = req.body;
+      
+      if (!uploadedBy) {
+        return res.status(400).json({ message: "uploadedBy is required" });
+      }
+
+      const fileUrl = `/uploads/${req.file.filename}`;
+      
+      const file = await storage.createFileUpload({
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        mimeType: req.file.mimetype,
+        size: req.file.size.toString(),
+        url: fileUrl,
+        uploadedBy,
+        relatedType: relatedType || null,
+        relatedId: relatedId || null,
+      });
+      
       res.json(file);
     } catch (error) {
       console.error("Create file error:", error);
