@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,20 +12,65 @@ interface Message {
 }
 
 export function AISupportTab() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "Hello! I'm your AI assistant. I can help you with information about our solar services, pricing, installation process, and more. How can I assist you today?",
-    },
-  ]);
+  const [location] = useLocation();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [initialGreeting, setInitialGreeting] = useState(false);
   const { toast } = useToast();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (!initialGreeting) {
+      fetchInitialGreeting();
+    }
+  }, [initialGreeting]);
+
+  const getCurrentContext = () => {
+    const pathname = location.split('?')[0];
+    let currentPage = "home";
+    
+    if (pathname === "/" || pathname === "/home") currentPage = "home";
+    else if (pathname === "/services") currentPage = "services";
+    else if (pathname === "/about") currentPage = "about";
+    else if (pathname === "/contact") currentPage = "contact";
+    else if (pathname === "/faq") currentPage = "faq";
+    
+    return { currentPage };
+  };
+
+  const fetchInitialGreeting = async () => {
+    setLoading(true);
+    try {
+      const context = getCurrentContext();
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          messages: [{ role: "user", content: "hello" }],
+          context
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessages([{ role: "assistant", content: data.message }]);
+        setInitialGreeting(true);
+      }
+    } catch (error) {
+      setMessages([{
+        role: "assistant",
+        content: "Hello! I'm your SolarTech AI assistant. I can help you with information about our solar services, pricing, installation process, and more. How can I assist you today?"
+      }]);
+      setInitialGreeting(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
@@ -35,10 +81,14 @@ export function AISupportTab() {
     setLoading(true);
 
     try {
+      const context = getCurrentContext();
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...messages, userMessage] }),
+        body: JSON.stringify({ 
+          messages: [...messages, userMessage],
+          context
+        }),
       });
 
       const data = await response.json();
