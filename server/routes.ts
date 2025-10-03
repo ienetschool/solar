@@ -2,6 +2,7 @@ import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { intelligentChatbot } from "./ai-service";
+import { getNotificationService } from "./notification-service";
 import { WebSocketServer, WebSocket } from "ws";
 import multer from "multer";
 import path from "path";
@@ -152,13 +153,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const ticket = await storage.createTicket(req.body);
       
-      // Create notification for admin/agents
-      await storage.createNotification({
-        userId: req.body.userId,
-        title: "New Ticket Created",
-        message: `Ticket ${ticket.id}: ${ticket.title}`,
-        type: "ticket",
-        relatedId: ticket.id,
+      // Send comprehensive notifications
+      const notificationService = getNotificationService(storage);
+      await notificationService.notifyTicketCreation({
+        ticketId: ticket.id,
+        userId: ticket.userId,
+        title: ticket.title,
+        description: ticket.description,
+        category: ticket.category,
+        priority: ticket.priority,
+        userEmail: req.body.userEmail,
+        userName: req.body.userName,
+        userPhone: req.body.userPhone,
       });
 
       res.json(ticket);
@@ -339,6 +345,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/callbacks", async (req, res) => {
     try {
       const request = await storage.createCallbackRequest(req.body);
+      
+      // Send notifications
+      const notificationService = getNotificationService(storage);
+      await notificationService.notifyCallbackRequest({
+        requestId: request.id,
+        name: request.name,
+        email: request.email,
+        phone: request.phone,
+        preferredTime: request.preferredTime,
+        reason: request.reason,
+      });
+      
       res.json(request);
     } catch (error) {
       console.error("Create callback request error:", error);
