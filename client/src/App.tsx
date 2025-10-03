@@ -17,6 +17,7 @@ import SolarLogin from "@/pages/solar/SolarLogin";
 import Dashboard from "@/pages/Dashboard";
 import ChatPage from "@/pages/ChatPage";
 import TicketsPage from "@/pages/TicketsPage";
+import CallbacksPage from "@/pages/CallbacksPage";
 import UsersPage from "@/pages/UsersPage";
 import NotificationsPage from "@/pages/NotificationsPage";
 import NotFound from "@/pages/not-found";
@@ -59,6 +60,7 @@ function DashboardLayout() {
               <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
               <Route path="/chat" component={() => <ProtectedRoute component={ChatPage} />} />
               <Route path="/tickets" component={() => <ProtectedRoute component={TicketsPage} />} />
+              <Route path="/callbacks" component={() => <ProtectedRoute component={CallbacksPage} />} />
               <Route path="/users" component={() => <ProtectedRoute component={UsersPage} />} />
               <Route path="/notifications" component={() => <ProtectedRoute component={NotificationsPage} />} />
               <Route component={NotFound} />
@@ -101,6 +103,7 @@ function Router() {
       <Route path="/dashboard" component={DashboardLayout} />
       <Route path="/chat" component={DashboardLayout} />
       <Route path="/tickets" component={DashboardLayout} />
+      <Route path="/callbacks" component={DashboardLayout} />
       <Route path="/users" component={DashboardLayout} />
       <Route path="/notifications" component={DashboardLayout} />
       <Route component={PublicLayout} />

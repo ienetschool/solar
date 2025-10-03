@@ -6,6 +6,7 @@ import {
   Users,
   Settings,
   Bell,
+  Phone,
 } from "lucide-react";
 import {
   Sidebar,
@@ -40,6 +41,7 @@ export function AppSidebar() {
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
     { title: "Chat Queue", url: "/chat", icon: MessageSquare },
     { title: "Ticket Queue", url: "/tickets", icon: Ticket },
+    { title: "Callbacks", url: "/callbacks", icon: Phone },
     { title: "FAQ", url: "/faq", icon: HelpCircle },
   ];
 
@@ -47,6 +49,7 @@ export function AppSidebar() {
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
     { title: "Live Chat", url: "/chat", icon: MessageSquare },
     { title: "Tickets", url: "/tickets", icon: Ticket },
+    { title: "Callbacks", url: "/callbacks", icon: Phone },
     { title: "Users", url: "/users", icon: Users },
     { title: "FAQ", url: "/faq", icon: HelpCircle },
     { title: "Settings", url: "/settings", icon: Settings },
