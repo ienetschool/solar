@@ -20,6 +20,7 @@ import TicketsPage from "@/pages/TicketsPage";
 import CallbacksPage from "@/pages/CallbacksPage";
 import UsersPage from "@/pages/UsersPage";
 import NotificationsPage from "@/pages/NotificationsPage";
+import ContentManagementPage from "@/pages/ContentManagementPage";
 import NotFound from "@/pages/not-found";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -63,6 +64,7 @@ function DashboardLayout() {
               <Route path="/callbacks" component={() => <ProtectedRoute component={CallbacksPage} />} />
               <Route path="/users" component={() => <ProtectedRoute component={UsersPage} />} />
               <Route path="/notifications" component={() => <ProtectedRoute component={NotificationsPage} />} />
+              <Route path="/content" component={() => <ProtectedRoute component={ContentManagementPage} />} />
               <Route component={NotFound} />
             </Switch>
           </main>
@@ -106,6 +108,7 @@ function Router() {
       <Route path="/callbacks" component={DashboardLayout} />
       <Route path="/users" component={DashboardLayout} />
       <Route path="/notifications" component={DashboardLayout} />
+      <Route path="/content" component={DashboardLayout} />
       <Route component={PublicLayout} />
     </Switch>
   );

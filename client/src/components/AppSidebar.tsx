@@ -7,6 +7,7 @@ import {
   Settings,
   Bell,
   Phone,
+  FileText,
 } from "lucide-react";
 import {
   Sidebar,
@@ -51,6 +52,7 @@ export function AppSidebar() {
     { title: "Tickets", url: "/tickets", icon: Ticket },
     { title: "Callbacks", url: "/callbacks", icon: Phone },
     { title: "Users", url: "/users", icon: Users },
+    { title: "Content", url: "/content", icon: FileText },
     { title: "FAQ", url: "/faq", icon: HelpCircle },
     { title: "Settings", url: "/settings", icon: Settings },
   ];

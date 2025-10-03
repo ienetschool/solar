@@ -12,6 +12,7 @@ interface ChatClient {
   userId: string;
   username: string;
   isAgent: boolean;
+  sessionId?: string;
 }
 
 const uploadStorage = multer.diskStorage({
@@ -909,50 +910,190 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
   const clients = new Map<string, ChatClient>();
 
+  // Helper function to broadcast to session participants
+  const broadcastToSession = (sessionId: string, message: any, excludeUserId?: string) => {
+    clients.forEach((client) => {
+      if (
+        client.sessionId === sessionId &&
+        client.userId !== excludeUserId &&
+        client.ws.readyState === WebSocket.OPEN
+      ) {
+        client.ws.send(JSON.stringify(message));
+      }
+    });
+  };
+
+  // Helper function to notify agents
+  const notifyAgents = (message: any) => {
+    clients.forEach((client) => {
+      if (client.isAgent && client.ws.readyState === WebSocket.OPEN) {
+        client.ws.send(JSON.stringify(message));
+      }
+    });
+  };
+
   wss.on('connection', (ws) => {
     let clientId: string | null = null;
 
-    ws.on('message', (data) => {
+    ws.on('message', async (data) => {
       try {
         const message = JSON.parse(data.toString());
 
-        if (message.type === 'join') {
-          clientId = message.userId;
-          if (clientId) {
-            clients.set(clientId, {
-              ws,
-              userId: message.userId,
-              username: message.username,
-              isAgent: message.isAgent || false,
-            });
+        switch (message.type) {
+          case 'join': {
+            clientId = message.userId;
+            if (clientId) {
+              clients.set(clientId, {
+                ws,
+                userId: message.userId,
+                username: message.username,
+                isAgent: message.isAgent || false,
+                sessionId: message.sessionId,
+              });
+
+              // Notify others in the session
+              if (message.sessionId) {
+                broadcastToSession(message.sessionId, {
+                  type: 'user_joined',
+                  userId: message.userId,
+                  username: message.username,
+                  isAgent: message.isAgent || false,
+                  timestamp: new Date().toISOString(),
+                }, message.userId);
+              }
+
+              // If agent joining, notify them of available sessions
+              if (message.isAgent) {
+                notifyAgents({
+                  type: 'agent_online',
+                  agentId: message.userId,
+                  agentName: message.username,
+                });
+              }
+            }
+            break;
           }
 
-          if (message.isAgent) {
-            // Notify all customers that an agent joined
-            clients.forEach((client) => {
-              if (!client.isAgent && client.ws.readyState === WebSocket.OPEN) {
-                client.ws.send(JSON.stringify({
-                  type: 'agent_joined',
-                  agentName: message.username,
-                }));
+          case 'message': {
+            const sender = clients.get(message.userId);
+            if (!sender) break;
+
+            const chatMessage = {
+              type: 'message',
+              content: message.content,
+              sender: sender.username,
+              userId: message.userId,
+              isAgent: sender.isAgent,
+              sessionId: message.sessionId,
+              timestamp: new Date().toISOString(),
+              files: message.files || [],
+            };
+
+            // Save message to database if sessionId provided
+            if (message.sessionId) {
+              try {
+                await storage.createLiveChatMessage({
+                  sessionId: message.sessionId,
+                  userId: message.userId,
+                  message: message.content,
+                  isAgent: sender.isAgent,
+                  files: message.files || [],
+                });
+              } catch (error) {
+                console.error('Error saving chat message:', error);
               }
-            });
+
+              // Broadcast to session participants
+              broadcastToSession(message.sessionId, chatMessage, message.userId);
+            } else {
+              // Broadcast to all if no session (legacy support)
+              clients.forEach((client) => {
+                if (client.ws.readyState === WebSocket.OPEN && client.userId !== message.userId) {
+                  client.ws.send(JSON.stringify(chatMessage));
+                }
+              });
+            }
+            break;
           }
-        } else if (message.type === 'message') {
-          const sender = clients.get(message.userId);
-          
-          // Broadcast message to all connected clients
-          clients.forEach((client) => {
-            if (client.ws.readyState === WebSocket.OPEN && client.userId !== message.userId) {
-              client.ws.send(JSON.stringify({
-                type: 'message',
-                content: message.content,
-                sender: sender?.username || 'Unknown',
-                isAgent: sender?.isAgent || false,
+
+          case 'typing': {
+            if (message.sessionId) {
+              broadcastToSession(message.sessionId, {
+                type: 'typing',
+                userId: message.userId,
+                username: message.username,
+                isTyping: message.isTyping,
+              }, message.userId);
+            }
+            break;
+          }
+
+          case 'file_shared': {
+            if (message.sessionId) {
+              broadcastToSession(message.sessionId, {
+                type: 'file_shared',
+                userId: message.userId,
+                username: message.username,
+                fileId: message.fileId,
+                fileName: message.fileName,
+                fileUrl: message.fileUrl,
                 timestamp: new Date().toISOString(),
+              }, message.userId);
+            }
+            break;
+          }
+
+          case 'agent_transfer': {
+            // Notify the target agent
+            const targetAgent = Array.from(clients.values()).find(
+              c => c.userId === message.toAgentId && c.isAgent
+            );
+            
+            if (targetAgent && targetAgent.ws.readyState === WebSocket.OPEN) {
+              targetAgent.ws.send(JSON.stringify({
+                type: 'transfer_request',
+                sessionId: message.sessionId,
+                fromAgent: message.fromAgentName,
+                reason: message.reason,
+                transferId: message.transferId,
               }));
             }
-          });
+
+            // Notify session participants
+            if (message.sessionId) {
+              broadcastToSession(message.sessionId, {
+                type: 'agent_transfer',
+                message: `Chat is being transferred to another agent: ${message.reason}`,
+                timestamp: new Date().toISOString(),
+              });
+            }
+            break;
+          }
+
+          case 'close_session': {
+            if (message.sessionId) {
+              broadcastToSession(message.sessionId, {
+                type: 'session_closed',
+                message: 'This chat session has been closed.',
+                timestamp: new Date().toISOString(),
+              });
+
+              // Update session status in database
+              try {
+                await storage.updateLiveChatSessionStatus(
+                  message.sessionId,
+                  'closed',
+                  new Date()
+                );
+              } catch (error) {
+                console.error('Error closing session:', error);
+              }
+            }
+            break;
+          }
+
+          default:
+            console.log('Unknown message type:', message.type);
         }
       } catch (error) {
         console.error('WebSocket message error:', error);
@@ -961,8 +1102,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     ws.on('close', () => {
       if (clientId) {
+        const client = clients.get(clientId);
+        if (client?.sessionId) {
+          broadcastToSession(client.sessionId, {
+            type: 'user_left',
+            userId: clientId,
+            username: client.username,
+            timestamp: new Date().toISOString(),
+          });
+        }
         clients.delete(clientId);
       }
+    });
+
+    ws.on('error', (error) => {
+      console.error('WebSocket error:', error);
     });
   });
 
