@@ -1,0 +1,158 @@
+Here’s a **comprehensive plan and full prompt** for developing a **solar service company website support system** that incorporates AI-powered chat, live agent escalation, file uploads, callback requests, ticketing, and complete backend management for users, agents, and admins.
+
+---
+
+## ✅ 1. GOAL:
+
+To build a **modern support system** for a **solar service company** that ensures fast, efficient, and user-friendly support via:
+
+* **AI Chatbot**
+* **Live agent escalation**
+* **File upload**
+* **Ticket generation**
+* **Callback request**
+* **Multi-channel notifications** (Email, WhatsApp, In-App)
+* **Complete backend for management and monitoring**
+
+---
+
+## ✅ 2. USER FLOW SUMMARY
+
+### Step-by-Step Support Experience:
+
+1. **User visits website & logs in** (or continues as guest if allowed).
+2. **AI chatbot initiates support chat** (general queries, products, troubleshooting).
+3. If user requests:
+
+   * "Chat with Agent" → Assign available agent.
+   * "Upload File" → Allow file/photo upload for issue reference.
+4. **Live Agent support**:
+
+   * Agent sees user history, uploaded files, and can reply manually or use AI-suggested responses.
+5. **If unresolved or no agent available**:
+
+   * User requests **callback** or **ticket** is auto-generated.
+6. **Ticket Created**:
+
+   * Unique Reference ID generated.
+   * User notified via Email, WhatsApp, and In-App Push.
+7. **All actions/updates** on ticket are notified to user.
+8. Admin & agent panel links all data to users and reference IDs.
+
+---
+
+## ✅ 3. FEATURES OVERVIEW
+
+### 💬 Frontend Features (User-Facing)
+
+| Feature                    | Description                                         |
+| -------------------------- | --------------------------------------------------- |
+| AI Chatbot                 | Handles FAQs, service/product help, troubleshooting |
+| Live Agent Chat            | Request to chat with agent, assigned automatically  |
+| File Upload                | Upload photo or document to explain issue           |
+| Callback Request           | Schedule callback if agent is unavailable           |
+| Ticket Creation            | Auto-generated if unresolved; assigned to team      |
+| Multi-Channel Notification | Email, WhatsApp, Push Notifications                 |
+| Track Support History      | All chat, uploads, tickets in user account          |
+| Login / Register           | User authentication, profile access                 |
+
+---
+
+### 🛠️ Backend Features (Admin/Support Panel)
+
+| Module              | Description                                        |
+| ------------------- | -------------------------------------------------- |
+| User Management     | Add/edit/delete users, agents, admin roles         |
+| Agent Assignment    | Auto/manual ticket or chat assignment              |
+| Chat History        | Searchable logs linked to user and ticket ID       |
+| Ticket System       | Open/close tickets, status updates, internal notes |
+| Callback Management | Schedule and track callback requests               |
+| Notifications Panel | Configure templates for email/WA/push              |
+| File Repository     | Store/view user-uploaded files per ticket/chat     |
+| Page Management     | Edit FAQ, About Us, Contact pages                  |
+| Notification Logs   | View logs of messages sent to users                |
+| Analytics & Reports | Daily tickets, resolution time, agent performance  |
+
+---
+
+## ✅ 4. NOTIFICATION SYSTEM
+
+| Trigger            | Channels              | Content                           |
+| ------------------ | --------------------- | --------------------------------- |
+| Ticket Created     | Email, WhatsApp, Push | Ticket ID, expected response time |
+| Agent Reply        | Email, Push           | Message with reply summary        |
+| Callback Scheduled | Email, WhatsApp       | Time and agent assigned           |
+| Ticket Resolved    | Email, Push           | Confirmation of resolution        |
+| New Message        | Push                  | New message from agent or system  |
+
+---
+
+
+## ✅ 6. DATABASE DESIGN OVERVIEW (Core Tables)
+
+### `users`
+
+* id, name, email, phone, role (user, agent, admin), password, status
+
+### `tickets`
+
+* id, user_id, agent_id, status, subject, created_at, updated_at, reference_id
+
+### `messages`
+
+* id, ticket_id, sender_id, message, type (text, file, ai), created_at
+
+### `callbacks`
+
+* id, user_id, agent_id, scheduled_time, status
+
+### `uploads`
+
+* id, ticket_id, user_id, file_url, file_type, uploaded_at
+
+### `notifications`
+
+* id, user_id, type, content, channel (email, push, WA), sent_at
+
+### `settings_pages`
+
+* id, page_name, content, updated_by
+
+---
+
+
+
+## ✅ 8. ADMIN PANEL MODULES
+
+### 👨‍💼 Admin Dashboard
+
+* Total tickets, open/closed, agent performance
+* Live status (active chats, pending callbacks)
+
+### 🧑‍💼 Agent Panel
+
+* Assigned tickets/chats
+* Access to user history and uploaded files
+* Internal notes & AI response suggestions
+
+### ⚙️ Settings
+
+* Notification templates (Email, WhatsApp, Push)
+* Working hours, auto-reply messages
+* Role management (Admin, Agent, Supervisor)
+
+---
+
+
+
+## ✅ 10. OPTIONAL FUTURE FEATURES
+
+* AI-Powered File/Image Analysis (e.g., read serial numbers)
+* Voice-to-text in chat for accessibility
+* SLA tracking and escalation rules
+* Agent rating and feedback by users
+* Support for regional languages in AI
+
+---
+
+
