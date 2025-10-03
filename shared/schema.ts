@@ -1,9 +1,9 @@
 import { sql, relations } from "drizzle-orm";
-import { mysqlTable, text, varchar, timestamp, boolean, json } from "drizzle-orm/mysql-core";
+import { pgTable, text, varchar, timestamp, boolean, json, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = mysqlTable("users", {
+export const users = pgTable("users", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
@@ -12,7 +12,7 @@ export const users = mysqlTable("users", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const tickets = mysqlTable("tickets", {
+export const tickets = pgTable("tickets", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
   title: text("title").notNull(),
@@ -27,7 +27,7 @@ export const tickets = mysqlTable("tickets", {
   resolvedAt: timestamp("resolved_at"),
 });
 
-export const chatMessages = mysqlTable("chat_messages", {
+export const chatMessages = pgTable("chat_messages", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   ticketId: varchar("ticket_id", { length: 36 }).references(() => tickets.id),
   userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
@@ -37,7 +37,7 @@ export const chatMessages = mysqlTable("chat_messages", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const notifications = mysqlTable("notifications", {
+export const notifications = pgTable("notifications", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
   title: text("title").notNull(),
@@ -48,7 +48,7 @@ export const notifications = mysqlTable("notifications", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const ticketHistory = mysqlTable("ticket_history", {
+export const ticketHistory = pgTable("ticket_history", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   ticketId: varchar("ticket_id", { length: 36 }).notNull().references(() => tickets.id),
   userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
@@ -57,7 +57,7 @@ export const ticketHistory = mysqlTable("ticket_history", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const callbackRequests = mysqlTable("callback_requests", {
+export const callbackRequests = pgTable("callback_requests", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
   email: text("email").notNull(),
@@ -70,7 +70,7 @@ export const callbackRequests = mysqlTable("callback_requests", {
   contactedAt: timestamp("contacted_at"),
 });
 
-export const liveChatSessions = mysqlTable("live_chat_sessions", {
+export const liveChatSessions = pgTable("live_chat_sessions", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   userId: varchar("user_id", { length: 36 }).references(() => users.id),
   guestName: text("guest_name"),
@@ -82,7 +82,7 @@ export const liveChatSessions = mysqlTable("live_chat_sessions", {
   closedAt: timestamp("closed_at"),
 });
 
-export const liveChatMessages = mysqlTable("live_chat_messages", {
+export const liveChatMessages = pgTable("live_chat_messages", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   sessionId: varchar("session_id", { length: 36 }).notNull().references(() => liveChatSessions.id),
   userId: varchar("user_id", { length: 36 }).references(() => users.id),
@@ -92,7 +92,7 @@ export const liveChatMessages = mysqlTable("live_chat_messages", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const fileUploads = mysqlTable("file_uploads", {
+export const fileUploads = pgTable("file_uploads", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   filename: text("filename").notNull(),
   originalName: text("original_name").notNull(),
@@ -105,7 +105,7 @@ export const fileUploads = mysqlTable("file_uploads", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const agentTransfers = mysqlTable("agent_transfers", {
+export const agentTransfers = pgTable("agent_transfers", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   ticketId: varchar("ticket_id", { length: 36 }).references(() => tickets.id),
   chatSessionId: varchar("chat_session_id", { length: 36 }).references(() => liveChatSessions.id),
@@ -117,7 +117,7 @@ export const agentTransfers = mysqlTable("agent_transfers", {
   acceptedAt: timestamp("accepted_at"),
 });
 
-export const pages = mysqlTable("pages", {
+export const pages = pgTable("pages", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   slug: text("slug").notNull().unique(),
   title: text("title").notNull(),
@@ -132,33 +132,33 @@ export const pages = mysqlTable("pages", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const pageSections = mysqlTable("page_sections", {
+export const pageSections = pgTable("page_sections", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   pageId: varchar("page_id", { length: 36 }).notNull().references(() => pages.id),
   type: text("type").notNull(),
   title: text("title"),
   content: text("content"),
   imageUrl: text("image_url"),
-  order: text("order").notNull().default("0"),
+  order: integer("order").notNull().default(0),
   data: json("data").$type<Record<string, any>>(),
   isVisible: boolean("is_visible").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const faqs = mysqlTable("faqs", {
+export const faqs = pgTable("faqs", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   question: text("question").notNull(),
   answer: text("answer").notNull(),
   category: text("category").notNull(),
   page: text("page"),
-  order: text("order").notNull().default("0"),
+  order: integer("order").notNull().default(0),
   isPublished: boolean("is_published").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const supportForms = mysqlTable("support_forms", {
+export const supportForms = pgTable("support_forms", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
   email: text("email").notNull(),
