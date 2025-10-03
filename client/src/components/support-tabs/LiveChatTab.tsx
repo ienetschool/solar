@@ -31,14 +31,14 @@ export function LiveChatTab() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const connectToChat = (username: string, userId: string) => {
+  const connectToChat = (displayName: string, userId: string) => {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}/ws`;
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       setConnected(true);
-      ws.send(JSON.stringify({ type: "join", userId, username, isAgent: false }));
+      ws.send(JSON.stringify({ type: "join", userId, username: displayName, isAgent: false }));
       toast({
         title: "Connected",
         description: "You're now connected to live chat",
@@ -115,7 +115,7 @@ export function LiveChatTab() {
     const newMessage: Message = {
       id: Date.now().toString(),
       content: input,
-      sender: user?.username || guestName,
+      sender: user?.name || guestName,
       isAgent: false,
       timestamp: new Date(),
     };
@@ -126,7 +126,7 @@ export function LiveChatTab() {
 
   useEffect(() => {
     if (user) {
-      connectToChat(user.username, user.id);
+      connectToChat(user.name, user.id);
     }
 
     return () => {
@@ -203,17 +203,17 @@ export function LiveChatTab() {
             <div
               key={message.id}
               className={`flex gap-3 ${
-                message.sender === (user?.username || guestName) ? "justify-end" : "justify-start"
+                message.sender === (user?.name || guestName) ? "justify-end" : "justify-start"
               }`}
             >
-              {message.sender !== (user?.username || guestName) && (
+              {message.sender !== (user?.name || guestName) && (
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <MessageSquare className="h-4 w-4 text-primary" />
                 </div>
               )}
               <div
                 className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                  message.sender === (user?.username || guestName)
+                  message.sender === (user?.name || guestName)
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted"
                 }`}
@@ -222,7 +222,7 @@ export function LiveChatTab() {
                 <p className="text-sm font-medium mb-1">{message.sender}</p>
                 {message.content}
               </div>
-              {message.sender === (user?.username || guestName) && (
+              {message.sender === (user?.name || guestName) && (
                 <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                   <User className="h-4 w-4 text-primary-foreground" />
                 </div>

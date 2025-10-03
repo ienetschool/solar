@@ -24,6 +24,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationCenter } from "@/components/NotificationCenter";
+import { QuickSupportButton } from "@/components/QuickSupportButton";
 
 function ProtectedRoute({ component: Component }: { component: () => JSX.Element }) {
   const { user } = useAuth();
@@ -112,6 +113,7 @@ export default function App() {
         <ThemeProvider>
           <AuthProvider>
             <Router />
+            <QuickSupportButton />
           </AuthProvider>
         </ThemeProvider>
         <Toaster />
