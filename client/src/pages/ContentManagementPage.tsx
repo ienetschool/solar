@@ -61,6 +61,8 @@ export default function ContentManagementPage() {
   const [editingFaq, setEditingFaq] = useState<Faq | null>(null);
   const [isPageDialogOpen, setIsPageDialogOpen] = useState(false);
   const [isFaqDialogOpen, setIsFaqDialogOpen] = useState(false);
+  const [pagePublished, setPagePublished] = useState(true);
+  const [faqPublished, setFaqPublished] = useState(true);
 
   // Fetch pages
   const { data: pages = [], isLoading: pagesLoading } = useQuery<Page[]>({
@@ -161,7 +163,7 @@ export default function ContentManagementPage() {
       ogTitle: formData.get("ogTitle") as string || null,
       ogDescription: formData.get("ogDescription") as string || null,
       ogImage: formData.get("ogImage") as string || null,
-      isPublished: formData.get("isPublished") === "on",
+      isPublished: pagePublished,
     };
 
     if (editingPage?.id) {
@@ -180,7 +182,7 @@ export default function ContentManagementPage() {
       category: formData.get("category") as string,
       page: formData.get("page") as string || null,
       order: formData.get("order") as string || "0",
-      isPublished: formData.get("isPublished") === "on",
+      isPublished: faqPublished,
     };
 
     if (editingFaq?.id) {
@@ -209,7 +211,7 @@ export default function ContentManagementPage() {
           <div className="flex justify-end">
             <Dialog open={isPageDialogOpen} onOpenChange={setIsPageDialogOpen}>
               <DialogTrigger asChild>
-                <Button onClick={() => setEditingPage(null)} data-testid="button-add-page">
+                <Button onClick={() => { setEditingPage(null); setPagePublished(true); }} data-testid="button-add-page">
                   <Plus className="mr-2 h-4 w-4" />
                   Add Page
                 </Button>
@@ -298,8 +300,8 @@ export default function ContentManagementPage() {
                     <div className="flex items-center space-x-2">
                       <Switch
                         id="isPublished"
-                        name="isPublished"
-                        defaultChecked={editingPage?.isPublished ?? true}
+                        checked={pagePublished}
+                        onCheckedChange={setPagePublished}
                         data-testid="switch-is-published"
                       />
                       <Label htmlFor="isPublished">Published</Label>
@@ -341,6 +343,7 @@ export default function ContentManagementPage() {
                           size="sm"
                           onClick={() => {
                             setEditingPage(page);
+                            setPagePublished(page.isPublished);
                             setIsPageDialogOpen(true);
                           }}
                           data-testid={`button-edit-page-${page.id}`}
@@ -373,7 +376,7 @@ export default function ContentManagementPage() {
           <div className="flex justify-end">
             <Dialog open={isFaqDialogOpen} onOpenChange={setIsFaqDialogOpen}>
               <DialogTrigger asChild>
-                <Button onClick={() => setEditingFaq(null)} data-testid="button-add-faq">
+                <Button onClick={() => { setEditingFaq(null); setFaqPublished(true); }} data-testid="button-add-faq">
                   <Plus className="mr-2 h-4 w-4" />
                   Add FAQ
                 </Button>
@@ -442,8 +445,8 @@ export default function ContentManagementPage() {
                     <div className="flex items-center space-x-2">
                       <Switch
                         id="isPublished"
-                        name="isPublished"
-                        defaultChecked={editingFaq?.isPublished ?? true}
+                        checked={faqPublished}
+                        onCheckedChange={setFaqPublished}
                         data-testid="switch-faq-published"
                       />
                       <Label htmlFor="isPublished">Published</Label>
@@ -488,6 +491,7 @@ export default function ContentManagementPage() {
                           size="sm"
                           onClick={() => {
                             setEditingFaq(faq);
+                            setFaqPublished(faq.isPublished);
                             setIsFaqDialogOpen(true);
                           }}
                           data-testid={`button-edit-faq-${faq.id}`}
