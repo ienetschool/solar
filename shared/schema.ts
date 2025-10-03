@@ -70,6 +70,108 @@ export const callbackRequests = mysqlTable("callback_requests", {
   contactedAt: timestamp("contacted_at"),
 });
 
+export const liveChatSessions = mysqlTable("live_chat_sessions", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id", { length: 36 }).references(() => users.id),
+  guestName: text("guest_name"),
+  guestEmail: text("guest_email"),
+  status: text("status").notNull().default("active"),
+  assignedTo: varchar("assigned_to", { length: 36 }).references(() => users.id),
+  page: text("page"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  closedAt: timestamp("closed_at"),
+});
+
+export const liveChatMessages = mysqlTable("live_chat_messages", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  sessionId: varchar("session_id", { length: 36 }).notNull().references(() => liveChatSessions.id),
+  userId: varchar("user_id", { length: 36 }).references(() => users.id),
+  message: text("message").notNull(),
+  isAgent: boolean("is_agent").notNull().default(false),
+  files: json("files").$type<string[]>().default([]),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const fileUploads = mysqlTable("file_uploads", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  filename: text("filename").notNull(),
+  originalName: text("original_name").notNull(),
+  mimeType: text("mime_type").notNull(),
+  size: text("size").notNull(),
+  url: text("url").notNull(),
+  uploadedBy: varchar("uploaded_by", { length: 36 }).notNull().references(() => users.id),
+  relatedType: text("related_type"),
+  relatedId: varchar("related_id", { length: 36 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const agentTransfers = mysqlTable("agent_transfers", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  ticketId: varchar("ticket_id", { length: 36 }).references(() => tickets.id),
+  chatSessionId: varchar("chat_session_id", { length: 36 }).references(() => liveChatSessions.id),
+  fromAgent: varchar("from_agent", { length: 36 }).references(() => users.id),
+  toAgent: varchar("to_agent", { length: 36 }).notNull().references(() => users.id),
+  reason: text("reason"),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  acceptedAt: timestamp("accepted_at"),
+});
+
+export const pages = mysqlTable("pages", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  metaDescription: text("meta_description"),
+  metaKeywords: text("meta_keywords"),
+  ogTitle: text("og_title"),
+  ogDescription: text("og_description"),
+  ogImage: text("og_image"),
+  schemaMarkup: json("schema_markup").$type<Record<string, any>>(),
+  isPublished: boolean("is_published").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const pageSections = mysqlTable("page_sections", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  pageId: varchar("page_id", { length: 36 }).notNull().references(() => pages.id),
+  type: text("type").notNull(),
+  title: text("title"),
+  content: text("content"),
+  imageUrl: text("image_url"),
+  order: text("order").notNull().default("0"),
+  data: json("data").$type<Record<string, any>>(),
+  isVisible: boolean("is_visible").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const faqs = mysqlTable("faqs", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  question: text("question").notNull(),
+  answer: text("answer").notNull(),
+  category: text("category").notNull(),
+  page: text("page"),
+  order: text("order").notNull().default("0"),
+  isPublished: boolean("is_published").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const supportForms = mysqlTable("support_forms", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  page: text("page"),
+  status: text("status").notNull().default("new"),
+  assignedTo: varchar("assigned_to", { length: 36 }).references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  respondedAt: timestamp("responded_at"),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   tickets: many(tickets),
@@ -120,6 +222,67 @@ export const ticketHistoryRelations = relations(ticketHistory, ({ one }) => ({
   }),
 }));
 
+export const liveChatSessionsRelations = relations(liveChatSessions, ({ one, many }) => ({
+  user: one(users, {
+    fields: [liveChatSessions.userId],
+    references: [users.id],
+  }),
+  assignedAgent: one(users, {
+    fields: [liveChatSessions.assignedTo],
+    references: [users.id],
+  }),
+  messages: many(liveChatMessages),
+  transfers: many(agentTransfers),
+}));
+
+export const liveChatMessagesRelations = relations(liveChatMessages, ({ one }) => ({
+  session: one(liveChatSessions, {
+    fields: [liveChatMessages.sessionId],
+    references: [liveChatSessions.id],
+  }),
+  user: one(users, {
+    fields: [liveChatMessages.userId],
+    references: [users.id],
+  }),
+}));
+
+export const fileUploadsRelations = relations(fileUploads, ({ one }) => ({
+  uploader: one(users, {
+    fields: [fileUploads.uploadedBy],
+    references: [users.id],
+  }),
+}));
+
+export const agentTransfersRelations = relations(agentTransfers, ({ one }) => ({
+  ticket: one(tickets, {
+    fields: [agentTransfers.ticketId],
+    references: [tickets.id],
+  }),
+  chatSession: one(liveChatSessions, {
+    fields: [agentTransfers.chatSessionId],
+    references: [liveChatSessions.id],
+  }),
+  from: one(users, {
+    fields: [agentTransfers.fromAgent],
+    references: [users.id],
+  }),
+  to: one(users, {
+    fields: [agentTransfers.toAgent],
+    references: [users.id],
+  }),
+}));
+
+export const pagesRelations = relations(pages, ({ many }) => ({
+  sections: many(pageSections),
+}));
+
+export const pageSectionsRelations = relations(pageSections, ({ one }) => ({
+  page: one(pages, {
+    fields: [pageSections.pageId],
+    references: [pages.id],
+  }),
+}));
+
 // Insert Schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -154,6 +317,52 @@ export const insertCallbackRequestSchema = createInsertSchema(callbackRequests).
   contactedAt: true,
 });
 
+export const insertLiveChatSessionSchema = createInsertSchema(liveChatSessions).omit({
+  id: true,
+  createdAt: true,
+  closedAt: true,
+});
+
+export const insertLiveChatMessageSchema = createInsertSchema(liveChatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertFileUploadSchema = createInsertSchema(fileUploads).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAgentTransferSchema = createInsertSchema(agentTransfers).omit({
+  id: true,
+  createdAt: true,
+  acceptedAt: true,
+});
+
+export const insertPageSchema = createInsertSchema(pages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPageSectionSchema = createInsertSchema(pageSections).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertFaqSchema = createInsertSchema(faqs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSupportFormSchema = createInsertSchema(supportForms).omit({
+  id: true,
+  createdAt: true,
+  respondedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -172,3 +381,27 @@ export type TicketHistory = typeof ticketHistory.$inferSelect;
 
 export type InsertCallbackRequest = z.infer<typeof insertCallbackRequestSchema>;
 export type CallbackRequest = typeof callbackRequests.$inferSelect;
+
+export type InsertLiveChatSession = z.infer<typeof insertLiveChatSessionSchema>;
+export type LiveChatSession = typeof liveChatSessions.$inferSelect;
+
+export type InsertLiveChatMessage = z.infer<typeof insertLiveChatMessageSchema>;
+export type LiveChatMessage = typeof liveChatMessages.$inferSelect;
+
+export type InsertFileUpload = z.infer<typeof insertFileUploadSchema>;
+export type FileUpload = typeof fileUploads.$inferSelect;
+
+export type InsertAgentTransfer = z.infer<typeof insertAgentTransferSchema>;
+export type AgentTransfer = typeof agentTransfers.$inferSelect;
+
+export type InsertPage = z.infer<typeof insertPageSchema>;
+export type Page = typeof pages.$inferSelect;
+
+export type InsertPageSection = z.infer<typeof insertPageSectionSchema>;
+export type PageSection = typeof pageSections.$inferSelect;
+
+export type InsertFaq = z.infer<typeof insertFaqSchema>;
+export type Faq = typeof faqs.$inferSelect;
+
+export type InsertSupportForm = z.infer<typeof insertSupportFormSchema>;
+export type SupportForm = typeof supportForms.$inferSelect;
