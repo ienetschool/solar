@@ -4,27 +4,34 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = mysqlTable("users", {
-  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  email: text("email").notNull().unique(),
-  role: text("role").notNull().default("customer"),
+  id: int("id").primaryKey().autoincrement(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  password: varchar("password", { length: 255 }).notNull(),
+  role: text("role", { enum: ['user', 'admin', 'support'] }).default('user'),
+  notificationPreferences: json("notification_preferences").$type<Record<string, any>>(),
+  fcmTokens: json("fcm_tokens").$type<string[]>(),
+  lastLogin: timestamp("last_login"),
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const tickets = mysqlTable("tickets", {
-  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
-  userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
-  title: text("title").notNull(),
+  id: int("id").primaryKey().autoincrement(),
+  title: varchar("title", { length: 255 }).notNull(),
   description: text("description").notNull(),
-  status: text("status").notNull().default("open"),
-  priority: text("priority").notNull().default("medium"),
-  category: text("category").notNull(),
-  assignedTo: varchar("assigned_to", { length: 36 }).references(() => users.id),
-  files: json("files").$type<string[]>().default([]),
+  status: text("status", { enum: ['open', 'in_progress', 'resolved', 'closed'] }).default('open'),
+  priority: text("priority", { enum: ['low', 'medium', 'high', 'urgent'] }).default('medium'),
+  category: varchar("category", { length: 255 }).notNull(),
+  userId: int("user_id").notNull().references(() => users.id),
+  assignedToId: int("assigned_to_id").references(() => users.id),
+  referenceNumber: varchar("reference_number", { length: 50 }),
+  resolvedAt: timestamp("resolved_at"),
+  closedAt: timestamp("closed_at"),
+  lastUpdated: timestamp("last_updated"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  resolvedAt: timestamp("resolved_at"),
 });
 
 export const chatMessages = mysqlTable("chat_messages", {
@@ -38,14 +45,19 @@ export const chatMessages = mysqlTable("chat_messages", {
 });
 
 export const notifications = mysqlTable("notifications", {
-  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
-  userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
-  title: text("title").notNull(),
+  id: int("id").primaryKey().autoincrement(),
+  userId: int("user_id").notNull().references(() => users.id),
+  type: text("type", { enum: ['ticket_update', 'chat_message', 'system_alert', 'faq_update', 'mention'] }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
   message: text("message").notNull(),
-  type: text("type").notNull(),
-  isRead: boolean("is_read").notNull().default(false),
-  relatedId: varchar("related_id", { length: 36 }),
+  metadata: json("metadata").$type<Record<string, any>>(),
+  priority: text("priority", { enum: ['low', 'medium', 'high', 'urgent'] }),
+  status: text("status", { enum: ['unread', 'read', 'archived'] }).default('unread'),
+  channels: json("channels").$type<string[]>(),
+  deliveryStatus: json("delivery_status").$type<Record<string, any>>(),
+  expiresAt: timestamp("expires_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const ticketHistory = mysqlTable("ticket_history", {
