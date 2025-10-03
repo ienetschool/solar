@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { HelpCircle } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { useState } from "react";
-import { QuickSupportDialog } from "./QuickSupportDialog";
+import { QuickSupportPopup } from "./QuickSupportPopup";
+import { useLocation } from "wouter";
 
 export function QuickSupportButton() {
   const [open, setOpen] = useState(false);
+  const [location] = useLocation();
 
   return (
     <>
@@ -28,10 +30,10 @@ export function QuickSupportButton() {
         onClick={() => setOpen(true)}
         data-testid="button-quick-support"
       >
-        <HelpCircle style={{ width: '24px', height: '24px', color: 'white' }} />
+        <MessageSquare style={{ width: '24px', height: '24px', color: 'white' }} />
       </button>
 
-      <QuickSupportDialog open={open} onOpenChange={setOpen} />
+      <QuickSupportPopup open={open} onOpenChange={setOpen} currentPage={location} />
     </>
   );
 }
