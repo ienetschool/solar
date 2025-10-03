@@ -9,11 +9,14 @@ import {
   type InsertNotification,
   type TicketHistory,
   type InsertTicketHistory,
+  type CallbackRequest,
+  type InsertCallbackRequest,
   users,
   tickets,
   chatMessages,
   notifications,
   ticketHistory,
+  callbackRequests,
 } from "@shared/schema";
 import { getDB } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -51,6 +54,12 @@ export interface IStorage {
   // Ticket history methods
   getTicketHistory(ticketId: string): Promise<TicketHistory[]>;
   createTicketHistory(history: InsertTicketHistory): Promise<TicketHistory>;
+
+  // Callback request methods
+  getCallbackRequests(): Promise<CallbackRequest[]>;
+  getCallbackRequest(id: string): Promise<CallbackRequest | undefined>;
+  createCallbackRequest(request: InsertCallbackRequest): Promise<CallbackRequest>;
+  updateCallbackStatus(id: string, status: string, contactedAt?: Date): Promise<CallbackRequest | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -230,6 +239,36 @@ export class DatabaseStorage implements IStorage {
     await db.insert(ticketHistory).values({ ...history, id } as any);
     const [newHistory] = await db.select().from(ticketHistory).where(eq(ticketHistory.id, id));
     return newHistory;
+  }
+
+  // Callback request methods
+  async getCallbackRequests(): Promise<CallbackRequest[]> {
+    const db = await getDB();
+    return db.select().from(callbackRequests).orderBy(desc(callbackRequests.createdAt));
+  }
+
+  async getCallbackRequest(id: string): Promise<CallbackRequest | undefined> {
+    const db = await getDB();
+    const [request] = await db.select().from(callbackRequests).where(eq(callbackRequests.id, id));
+    return request || undefined;
+  }
+
+  async createCallbackRequest(request: InsertCallbackRequest): Promise<CallbackRequest> {
+    const db = await getDB();
+    const id = crypto.randomUUID();
+    await db.insert(callbackRequests).values({ ...request, id } as any);
+    const [newRequest] = await db.select().from(callbackRequests).where(eq(callbackRequests.id, id));
+    return newRequest;
+  }
+
+  async updateCallbackStatus(id: string, status: string, contactedAt?: Date): Promise<CallbackRequest | undefined> {
+    const db = await getDB();
+    await db
+      .update(callbackRequests)
+      .set({ status, contactedAt })
+      .where(eq(callbackRequests.id, id));
+    const [request] = await db.select().from(callbackRequests).where(eq(callbackRequests.id, id));
+    return request || undefined;
   }
 }
 

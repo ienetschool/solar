@@ -57,6 +57,19 @@ export const ticketHistory = mysqlTable("ticket_history", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const callbackRequests = mysqlTable("callback_requests", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  preferredTime: text("preferred_time").notNull(),
+  reason: text("reason").notNull(),
+  status: text("status").notNull().default("pending"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  contactedAt: timestamp("contacted_at"),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   tickets: many(tickets),
@@ -135,6 +148,12 @@ export const insertTicketHistorySchema = createInsertSchema(ticketHistory).omit(
   createdAt: true,
 });
 
+export const insertCallbackRequestSchema = createInsertSchema(callbackRequests).omit({
+  id: true,
+  createdAt: true,
+  contactedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -150,3 +169,6 @@ export type Notification = typeof notifications.$inferSelect;
 
 export type InsertTicketHistory = z.infer<typeof insertTicketHistorySchema>;
 export type TicketHistory = typeof ticketHistory.$inferSelect;
+
+export type InsertCallbackRequest = z.infer<typeof insertCallbackRequestSchema>;
+export type CallbackRequest = typeof callbackRequests.$inferSelect;

@@ -1,19 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import OpenAI from "openai";
+import { intelligentChatbot } from "./ai-service";
 import { WebSocketServer, WebSocket } from "ws";
-
-let openai: OpenAI | null = null;
-
-function getOpenAI() {
-  if (!openai && process.env.OPENAI_API_KEY) {
-    openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-  }
-  return openai;
-}
 
 interface ChatClient {
   ws: WebSocket;
@@ -25,51 +14,27 @@ interface ChatClient {
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", async (req, res) => {
     try {
-      const { messages } = req.body;
-      const openaiClient = getOpenAI();
-
-      if (!openaiClient) {
-        return res.status(503).json({
-          message: "AI chat is currently unavailable. OpenAI API key is not configured. Please contact our support team at (555) 123-4567.",
+      const { messages, context } = req.body;
+      
+      if (!messages || messages.length === 0) {
+        return res.status(400).json({
+          message: "No messages provided",
         });
       }
 
-      const systemMessage = {
-        role: "system",
-        content: `You are a helpful AI assistant for SolarTech, a professional solar energy company. You help customers with:
-        
-- Information about residential and commercial solar installations
-- Solar panel products and energy storage solutions
-- Pricing and financing options (federal tax credits up to 30%, various payment plans available)
-- Installation process and timeline (typically 4-8 weeks from consultation to activation)
-- Maintenance and warranty information (25-year panel warranty, 10-year battery warranty)
-- Energy savings calculations and environmental benefits
-- Technical specifications and system requirements
+      const lastMessage = messages[messages.length - 1];
+      
+      if (lastMessage.role !== "user") {
+        return res.status(400).json({
+          message: "Last message must be from user",
+        });
+      }
 
-Key company details:
-- 15+ years of experience
-- 5,000+ successful installations
-- 50MW total capacity installed
-- Residential solar starting at $15,000
-- Commercial solutions with custom pricing
-- Energy storage starting at $8,500
-- Maintenance plans from $299/year
+      const response = intelligentChatbot.findBestMatch(lastMessage.content, context);
 
-Be professional, knowledgeable, and helpful. Encourage users to schedule a free consultation or get a personalized quote for detailed information specific to their needs.`,
-      };
-
-      const completion = await openaiClient.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [systemMessage, ...messages],
-        temperature: 0.7,
-        max_tokens: 500,
-      });
-
-      const assistantMessage = completion.choices[0].message.content;
-
-      res.json({ message: assistantMessage });
+      res.json({ message: response });
     } catch (error) {
-      console.error("OpenAI API error:", error);
+      console.error("Chat error:", error);
       res.status(500).json({
         message: "I apologize, but I'm having trouble processing your request right now. Please try again or contact our support team at (555) 123-4567.",
       });
@@ -324,6 +289,134 @@ Be professional, knowledgeable, and helpful. Encourage users to schedule a free 
     } catch (error) {
       console.error("Get ticket history error:", error);
       res.status(500).json({ message: "Failed to fetch ticket history" });
+    }
+  });
+
+  // Callback request routes
+  app.get("/api/callbacks", async (req, res) => {
+    try {
+      const requests = await storage.getCallbackRequests();
+      res.json(requests);
+    } catch (error) {
+      console.error("Get callback requests error:", error);
+      res.status(500).json({ message: "Failed to fetch callback requests" });
+    }
+  });
+
+  app.post("/api/callbacks", async (req, res) => {
+    try {
+      const request = await storage.createCallbackRequest(req.body);
+      res.json(request);
+    } catch (error) {
+      console.error("Create callback request error:", error);
+      res.status(500).json({ message: "Failed to create callback request" });
+    }
+  });
+
+  app.patch("/api/callbacks/:id", async (req, res) => {
+    try {
+      const { status, contactedAt } = req.body;
+      const request = await storage.updateCallbackStatus(
+        req.params.id, 
+        status,
+        contactedAt ? new Date(contactedAt) : undefined
+      );
+      if (!request) {
+        return res.status(404).json({ message: "Callback request not found" });
+      }
+      res.json(request);
+    } catch (error) {
+      console.error("Update callback request error:", error);
+      res.status(500).json({ message: "Failed to update callback request" });
+    }
+  });
+
+  // FAQ routes
+  app.get("/api/faq", async (req, res) => {
+    try {
+      const category = req.query.category as string | undefined;
+      const context = req.query.context as string | undefined;
+      
+      let faqs;
+      if (context) {
+        faqs = intelligentChatbot.getFAQsByContext(context);
+      } else if (category) {
+        faqs = intelligentChatbot.getFAQsByCategory(category);
+      } else {
+        faqs = intelligentChatbot.getFAQsByCategory();
+      }
+      
+      res.json(faqs);
+    } catch (error) {
+      console.error("Get FAQs error:", error);
+      res.status(500).json({ message: "Failed to fetch FAQs" });
+    }
+  });
+
+  app.get("/api/faq/categories", async (req, res) => {
+    try {
+      const categories = intelligentChatbot.getCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Get FAQ categories error:", error);
+      res.status(500).json({ message: "Failed to fetch FAQ categories" });
+    }
+  });
+
+  // Agent availability check
+  app.get("/api/agents/online", async (req, res) => {
+    try {
+      const agents = await storage.getAllUsers();
+      const onlineAgents = agents.filter(user => user.role === "agent" || user.role === "admin");
+      res.json({ available: onlineAgents.length > 0, count: onlineAgents.length });
+    } catch (error) {
+      console.error("Get agent availability error:", error);
+      res.status(500).json({ available: false, count: 0 });
+    }
+  });
+
+  // Page context detection
+  app.post("/api/context/detect", async (req, res) => {
+    try {
+      const { pathname, search } = req.body;
+      
+      let context: any = {
+        page: pathname || "/",
+        service: null,
+        category: null,
+        prefilledData: {}
+      };
+
+      if (pathname === "/" || pathname === "/home") {
+        context.page = "home";
+        context.category = "general";
+      } else if (pathname === "/services") {
+        context.page = "services";
+        context.category = "services";
+        context.service = "general";
+      } else if (pathname === "/about") {
+        context.page = "about";
+        context.category = "company";
+      } else if (pathname === "/contact") {
+        context.page = "contact";
+        context.category = "contact";
+      } else if (pathname === "/faq") {
+        context.page = "faq";
+        context.category = "support";
+      }
+
+      if (search && search.includes("service=residential")) {
+        context.service = "residential";
+        context.prefilledData.category = "Residential Installation";
+      } else if (search && search.includes("service=commercial")) {
+        context.service = "commercial";
+        context.prefilledData.category = "Commercial Solutions";
+      }
+
+      res.json(context);
+    } catch (error) {
+      console.error("Context detection error:", error);
+      res.status(500).json({ message: "Failed to detect context" });
     }
   });
 
