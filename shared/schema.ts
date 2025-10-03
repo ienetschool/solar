@@ -36,8 +36,8 @@ export const tickets = mysqlTable("tickets", {
 
 export const chatMessages = mysqlTable("chat_messages", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
-  ticketId: varchar("ticket_id", { length: 36 }).references(() => tickets.id),
-  userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
+  ticketId: int("ticket_id").references(() => tickets.id),
+  userId: int("user_id").notNull().references(() => users.id),
   message: text("message").notNull(),
   isAgent: boolean("is_agent").notNull().default(false),
   files: json("files").$type<string[]>().default([]),
@@ -62,8 +62,8 @@ export const notifications = mysqlTable("notifications", {
 
 export const ticketHistory = mysqlTable("ticket_history", {
   id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
-  ticketId: varchar("ticket_id", { length: 36 }).notNull().references(() => tickets.id),
-  userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
+  ticketId: int("ticket_id").notNull().references(() => tickets.id),
+  userId: int("user_id").notNull().references(() => users.id),
   action: text("action").notNull(),
   details: json("details").$type<Record<string, any>>(),
   createdAt: timestamp("created_at").notNull().defaultNow(),

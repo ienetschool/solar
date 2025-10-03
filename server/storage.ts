@@ -48,35 +48,35 @@ import { eq, desc, and } from "drizzle-orm";
 // Storage interface for all CRUD operations
 export interface IStorage {
   // User methods
-  getUser(id: string): Promise<User | undefined>;
+  getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getAllUsers(): Promise<User[]>;
-  updateUserRole(id: string, role: string): Promise<User | undefined>;
+  updateUserRole(id: number, role: string): Promise<User | undefined>;
 
   // Ticket methods
-  getTicket(id: string): Promise<Ticket | undefined>;
-  getTicketsByUser(userId: string): Promise<Ticket[]>;
+  getTicket(id: number): Promise<Ticket | undefined>;
+  getTicketsByUser(userId: number): Promise<Ticket[]>;
   getAllTickets(): Promise<Ticket[]>;
   createTicket(ticket: InsertTicket): Promise<Ticket>;
-  updateTicketStatus(id: string, status: string, resolvedAt?: Date): Promise<Ticket | undefined>;
-  updateTicketAssignment(id: string, assignedTo: string | null): Promise<Ticket | undefined>;
-  updateTicket(id: string, updates: Partial<InsertTicket>): Promise<Ticket | undefined>;
+  updateTicketStatus(id: number, status: string, resolvedAt?: Date): Promise<Ticket | undefined>;
+  updateTicketAssignment(id: number, assignedTo: number | null): Promise<Ticket | undefined>;
+  updateTicket(id: number, updates: Partial<InsertTicket>): Promise<Ticket | undefined>;
 
   // Chat message methods
-  getChatMessagesByTicket(ticketId: string): Promise<ChatMessage[]>;
+  getChatMessagesByTicket(ticketId: number): Promise<ChatMessage[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
 
   // Notification methods
-  getNotificationsByUser(userId: string): Promise<Notification[]>;
-  getUnreadNotificationCount(userId: string): Promise<number>;
+  getNotificationsByUser(userId: number): Promise<Notification[]>;
+  getUnreadNotificationCount(userId: number): Promise<number>;
   createNotification(notification: InsertNotification): Promise<Notification>;
-  markNotificationAsRead(id: string): Promise<Notification | undefined>;
-  markAllNotificationsAsRead(userId: string): Promise<void>;
+  markNotificationAsRead(id: number): Promise<Notification | undefined>;
+  markAllNotificationsAsRead(userId: number): Promise<void>;
 
   // Ticket history methods
-  getTicketHistory(ticketId: string): Promise<TicketHistory[]>;
+  getTicketHistory(ticketId: number): Promise<TicketHistory[]>;
   createTicketHistory(history: InsertTicketHistory): Promise<TicketHistory>;
 
   // Callback request methods
@@ -146,7 +146,7 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   // User methods
-  async getUser(id: string): Promise<User | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     const db = await getDB();
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
@@ -154,7 +154,7 @@ export class DatabaseStorage implements IStorage {
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     const db = await getDB();
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const [user] = await db.select().from(users).where(eq(users.email, username));
     return user || undefined;
   }
 
@@ -166,9 +166,8 @@ export class DatabaseStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const db = await getDB();
-    const id = crypto.randomUUID();
-    await db.insert(users).values({ ...insertUser, id } as any);
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+    const result = await db.insert(users).values(insertUser as any);
+    const [user] = await db.select().from(users).where(eq(users.id, result[0].insertId));
     return user;
   }
 
@@ -177,24 +176,24 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(users);
   }
 
-  async updateUserRole(id: string, role: string): Promise<User | undefined> {
+  async updateUserRole(id: number, role: string): Promise<User | undefined> {
     const db = await getDB();
     await db
       .update(users)
-      .set({ role })
+      .set({ role: role as any })
       .where(eq(users.id, id));
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
   // Ticket methods
-  async getTicket(id: string): Promise<Ticket | undefined> {
+  async getTicket(id: number): Promise<Ticket | undefined> {
     const db = await getDB();
     const [ticket] = await db.select().from(tickets).where(eq(tickets.id, id));
     return ticket || undefined;
   }
 
-  async getTicketsByUser(userId: string): Promise<Ticket[]> {
+  async getTicketsByUser(userId: number): Promise<Ticket[]> {
     const db = await getDB();
     return db.select().from(tickets).where(eq(tickets.userId, userId)).orderBy(desc(tickets.createdAt));
   }
@@ -206,33 +205,32 @@ export class DatabaseStorage implements IStorage {
 
   async createTicket(ticket: InsertTicket): Promise<Ticket> {
     const db = await getDB();
-    const id = crypto.randomUUID();
-    await db.insert(tickets).values({ ...ticket, id } as any);
-    const [newTicket] = await db.select().from(tickets).where(eq(tickets.id, id));
+    const result = await db.insert(tickets).values(ticket as any);
+    const [newTicket] = await db.select().from(tickets).where(eq(tickets.id, result[0].insertId));
     return newTicket;
   }
 
-  async updateTicketStatus(id: string, status: string, resolvedAt?: Date): Promise<Ticket | undefined> {
+  async updateTicketStatus(id: number, status: string, resolvedAt?: Date): Promise<Ticket | undefined> {
     const db = await getDB();
     await db
       .update(tickets)
-      .set({ status, updatedAt: new Date(), resolvedAt })
+      .set({ status: status as any, updatedAt: new Date(), resolvedAt })
       .where(eq(tickets.id, id));
     const [ticket] = await db.select().from(tickets).where(eq(tickets.id, id));
     return ticket || undefined;
   }
 
-  async updateTicketAssignment(id: string, assignedTo: string | null): Promise<Ticket | undefined> {
+  async updateTicketAssignment(id: number, assignedTo: number | null): Promise<Ticket | undefined> {
     const db = await getDB();
     await db
       .update(tickets)
-      .set({ assignedTo, updatedAt: new Date() })
+      .set({ assignedToId: assignedTo, updatedAt: new Date() })
       .where(eq(tickets.id, id));
     const [ticket] = await db.select().from(tickets).where(eq(tickets.id, id));
     return ticket || undefined;
   }
 
-  async updateTicket(id: string, updates: Partial<InsertTicket>): Promise<Ticket | undefined> {
+  async updateTicket(id: number, updates: Partial<InsertTicket>): Promise<Ticket | undefined> {
     const db = await getDB();
     await db
       .update(tickets)
@@ -243,7 +241,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Chat message methods
-  async getChatMessagesByTicket(ticketId: string): Promise<ChatMessage[]> {
+  async getChatMessagesByTicket(ticketId: number): Promise<ChatMessage[]> {
     const db = await getDB();
     return db
       .select()
@@ -254,14 +252,13 @@ export class DatabaseStorage implements IStorage {
 
   async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
     const db = await getDB();
-    const id = crypto.randomUUID();
-    await db.insert(chatMessages).values({ ...message, id } as any);
-    const [newMessage] = await db.select().from(chatMessages).where(eq(chatMessages.id, id));
+    await db.insert(chatMessages).values(message as any);
+    const [newMessage] = await db.select().from(chatMessages).where(eq(chatMessages.userId, message.userId)).orderBy(desc(chatMessages.createdAt)).limit(1);
     return newMessage;
   }
 
   // Notification methods
-  async getNotificationsByUser(userId: string): Promise<Notification[]> {
+  async getNotificationsByUser(userId: number): Promise<Notification[]> {
     const db = await getDB();
     return db
       .select()
@@ -270,43 +267,42 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(notifications.createdAt));
   }
 
-  async getUnreadNotificationCount(userId: string): Promise<number> {
+  async getUnreadNotificationCount(userId: number): Promise<number> {
     const db = await getDB();
     const results = await db
       .select()
       .from(notifications)
-      .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
+      .where(and(eq(notifications.userId, userId), eq(notifications.status, 'unread')));
     return results.length;
   }
 
   async createNotification(notification: InsertNotification): Promise<Notification> {
     const db = await getDB();
-    const id = crypto.randomUUID();
-    await db.insert(notifications).values({ ...notification, id } as any);
-    const [newNotification] = await db.select().from(notifications).where(eq(notifications.id, id));
+    const result = await db.insert(notifications).values(notification as any);
+    const [newNotification] = await db.select().from(notifications).where(eq(notifications.id, result[0].insertId));
     return newNotification;
   }
 
-  async markNotificationAsRead(id: string): Promise<Notification | undefined> {
+  async markNotificationAsRead(id: number): Promise<Notification | undefined> {
     const db = await getDB();
     await db
       .update(notifications)
-      .set({ isRead: true })
+      .set({ status: 'read' })
       .where(eq(notifications.id, id));
     const [notification] = await db.select().from(notifications).where(eq(notifications.id, id));
     return notification || undefined;
   }
 
-  async markAllNotificationsAsRead(userId: string): Promise<void> {
+  async markAllNotificationsAsRead(userId: number): Promise<void> {
     const db = await getDB();
     await db
       .update(notifications)
-      .set({ isRead: true })
+      .set({ status: 'read' })
       .where(eq(notifications.userId, userId));
   }
 
   // Ticket history methods
-  async getTicketHistory(ticketId: string): Promise<TicketHistory[]> {
+  async getTicketHistory(ticketId: number): Promise<TicketHistory[]> {
     const db = await getDB();
     return db
       .select()
