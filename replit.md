@@ -1,13 +1,31 @@
-# SolarTech - Solar Energy Company Platform
+# Green Power Solutions - Solar Energy Company Platform
 
 ## Overview
 
-SolarTech is a hybrid web application that combines a marketing website for a solar energy company with an integrated customer support platform. It features a public-facing website with AI-powered chat assistance and a comprehensive customer support system including ticketing, live chat, and user management. Built with React, Express, and MySQL, the platform serves both residential and commercial solar customers, offering marketing content and robust support tools. The project aims to provide an all-encompassing digital solution for the solar energy sector, enhancing customer engagement and streamlining support operations.
+Green Power Solutions is a hybrid web application that combines a marketing website for a solar energy company with an integrated customer support platform. It features a public-facing website with AI-powered chat assistance and a comprehensive customer support system including ticketing, live chat, and user management. Built with React, Express, and MySQL, the platform serves both residential and commercial solar customers in Guyana, offering marketing content and robust support tools. The project aims to provide an all-encompassing digital solution for the solar energy sector, enhancing customer engagement and streamlining support operations.
+
+## Recent Changes (October 2025)
+
+### Rebranding to Green Power Solutions
+- **Complete rebrand** from SolarTech to Green Power Solutions
+- Updated all components: Header, Footer, Home, About, Contact, Login, AI Chat
+- Redesigned hero section with "Empowering Tomorrow - Your Solar Energy Solution Provider"
+- Updated all content to reflect Green Power Solutions' operations in Guyana
+- Updated AI chatbot with 20+ FAQ entries from www.greenpowersolutions.co
+- Added Guyana-specific content for pricing, installation, maintenance, and financing
+
+### Technical Updates
+- Configured for MySQL database (awaiting DATABASE_URL from user)
+- Fixed Vite configuration with `allowedHosts: true` for Replit proxy compatibility
+- Added missing AI service methods: `getFAQsByContext()`, `getFAQsByCategory()`, `getCategories()`
+- Updated workflow to run on port 5000 with webview output
+- All LSP errors resolved
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
 **Important**: No external API dependencies for core features - use built-in solutions only.
+**Database**: MySQL required (not PostgreSQL) - need DATABASE_URL credentials from user.
 
 ## System Architecture
 
@@ -21,7 +39,14 @@ The backend uses Express.js with TypeScript and ES Modules. It provides RESTful 
 
 ### AI Service Architecture (`server/ai-service.ts`)
 
-The AI service implements an `IntelligentChatbot` class with a singleton pattern. It uses a comprehensive FAQ database with over 50 entries, categorized by topics like pricing, services, installation, and financing. The chatbot employs keyword-based pattern matching, context filtering (e.g., `home`, `services`, `contact`), and a fuzzy matching algorithm for answer relevance, providing graceful fallbacks.
+The AI service implements an `IntelligentChatbot` class with a singleton pattern. It uses a comprehensive FAQ database with 20+ entries tailored to Green Power Solutions, categorized by topics like pricing, services, installation, financing, and Guyana-specific operations. The chatbot employs keyword-based pattern matching, context filtering (e.g., `home`, `services`, `contact`), and a fuzzy matching algorithm for answer relevance, providing graceful fallbacks.
+
+**Available Methods:**
+- `findBestMatch(query, context?)` - Returns best FAQ answer for user query
+- `getContextSuggestion(page)` - Provides page-specific chat suggestions
+- `getFAQsByContext(context)` - Returns FAQs filtered by context
+- `getFAQsByCategory(category?)` - Returns FAQs by category or all FAQs
+- `getCategories()` - Returns list of all FAQ categories
 
 ### Data Schema
 
@@ -66,3 +91,28 @@ A consistent design system utilizes a primary warm amber/gold and secondary deep
 ### Database Management
 
 - **Drizzle Kit**: Used for schema management, migrations, and development schema updates with MySQL dialect.
+
+## FAQ Content from Green Power Solutions
+
+The AI chatbot includes comprehensive FAQs covering:
+- **Pricing**: Cost ranges for 1kW-10kW systems in Guyana
+- **Installation**: Professional installation process and timeline
+- **Maintenance**: Ongoing monitoring and support services
+- **Financing**: Payment options and government incentives
+- **Services**: Solar surveys, assessments, custom solutions
+- **Products**: Grid-tie, off-grid, and hybrid solar systems
+- **Consultation**: Free assessments and quote process
+
+## Next Steps
+
+1. **Database Setup**: Waiting for MySQL DATABASE_URL credentials from user
+2. **Testing**: Once database is connected, test all CRUD operations
+3. **Deployment**: Configure production deployment settings
+4. **Content**: Verify all Green Power Solutions content is accurate
+
+## Development Commands
+
+- `npm run dev` - Start development server (frontend + backend on port 5000)
+- `npm run db:push` - Push Drizzle schema changes to MySQL database
+- `npm run db:push --force` - Force push schema changes (for data-loss warnings)
+- `npm run db:studio` - Open Drizzle Studio for database management
