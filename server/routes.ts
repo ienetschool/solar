@@ -76,6 +76,257 @@ Be professional, knowledgeable, and helpful. Encourage users to schedule a free 
     }
   });
 
+  // User routes
+  app.get("/api/users", async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      console.error("Get users error:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  app.get("/api/users/:id", async (req, res) => {
+    try {
+      const user = await storage.getUser(req.params.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      console.error("Get user error:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  app.post("/api/users", async (req, res) => {
+    try {
+      const user = await storage.createUser(req.body);
+      res.json(user);
+    } catch (error) {
+      console.error("Create user error:", error);
+      res.status(500).json({ message: "Failed to create user" });
+    }
+  });
+
+  app.patch("/api/users/:id/role", async (req, res) => {
+    try {
+      const user = await storage.updateUserRole(req.params.id, req.body.role);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      console.error("Update user role error:", error);
+      res.status(500).json({ message: "Failed to update user role" });
+    }
+  });
+
+  // Ticket routes
+  app.get("/api/tickets", async (req, res) => {
+    try {
+      const userId = req.query.userId as string | undefined;
+      const tickets = userId 
+        ? await storage.getTicketsByUser(userId)
+        : await storage.getAllTickets();
+      res.json(tickets);
+    } catch (error) {
+      console.error("Get tickets error:", error);
+      res.status(500).json({ message: "Failed to fetch tickets" });
+    }
+  });
+
+  app.get("/api/tickets/:id", async (req, res) => {
+    try {
+      const ticket = await storage.getTicket(req.params.id);
+      if (!ticket) {
+        return res.status(404).json({ message: "Ticket not found" });
+      }
+      res.json(ticket);
+    } catch (error) {
+      console.error("Get ticket error:", error);
+      res.status(500).json({ message: "Failed to fetch ticket" });
+    }
+  });
+
+  app.post("/api/tickets", async (req, res) => {
+    try {
+      const ticket = await storage.createTicket(req.body);
+      
+      // Create notification for admin/agents
+      await storage.createNotification({
+        userId: req.body.userId,
+        title: "New Ticket Created",
+        message: `Ticket ${ticket.id}: ${ticket.title}`,
+        type: "ticket",
+        relatedId: ticket.id,
+      });
+
+      res.json(ticket);
+    } catch (error) {
+      console.error("Create ticket error:", error);
+      res.status(500).json({ message: "Failed to create ticket" });
+    }
+  });
+
+  app.patch("/api/tickets/:id/status", async (req, res) => {
+    try {
+      const { status, resolvedAt } = req.body;
+      const ticket = await storage.updateTicketStatus(
+        req.params.id, 
+        status, 
+        resolvedAt ? new Date(resolvedAt) : undefined
+      );
+      if (!ticket) {
+        return res.status(404).json({ message: "Ticket not found" });
+      }
+      
+      // Create history entry
+      await storage.createTicketHistory({
+        ticketId: ticket.id,
+        userId: req.body.userId || ticket.userId,
+        action: `Status changed to ${status}`,
+      });
+
+      res.json(ticket);
+    } catch (error) {
+      console.error("Update ticket status error:", error);
+      res.status(500).json({ message: "Failed to update ticket status" });
+    }
+  });
+
+  app.patch("/api/tickets/:id/assign", async (req, res) => {
+    try {
+      const ticket = await storage.updateTicketAssignment(req.params.id, req.body.assignedTo);
+      if (!ticket) {
+        return res.status(404).json({ message: "Ticket not found" });
+      }
+
+      // Create history entry
+      if (req.body.assignedTo) {
+        await storage.createTicketHistory({
+          ticketId: ticket.id,
+          userId: req.body.userId || ticket.userId,
+          action: `Assigned to ${req.body.assignedTo}`,
+        });
+
+        // Notify assigned user
+        await storage.createNotification({
+          userId: req.body.assignedTo,
+          title: "Ticket Assigned",
+          message: `You have been assigned to ticket ${ticket.id}`,
+          type: "ticket",
+          relatedId: ticket.id,
+        });
+      }
+
+      res.json(ticket);
+    } catch (error) {
+      console.error("Assign ticket error:", error);
+      res.status(500).json({ message: "Failed to assign ticket" });
+    }
+  });
+
+  app.patch("/api/tickets/:id", async (req, res) => {
+    try {
+      const ticket = await storage.updateTicket(req.params.id, req.body);
+      if (!ticket) {
+        return res.status(404).json({ message: "Ticket not found" });
+      }
+      res.json(ticket);
+    } catch (error) {
+      console.error("Update ticket error:", error);
+      res.status(500).json({ message: "Failed to update ticket" });
+    }
+  });
+
+  // Chat message routes
+  app.get("/api/chat-messages/:ticketId", async (req, res) => {
+    try {
+      const messages = await storage.getChatMessagesByTicket(req.params.ticketId);
+      res.json(messages);
+    } catch (error) {
+      console.error("Get chat messages error:", error);
+      res.status(500).json({ message: "Failed to fetch chat messages" });
+    }
+  });
+
+  app.post("/api/chat-messages", async (req, res) => {
+    try {
+      const message = await storage.createChatMessage(req.body);
+      res.json(message);
+    } catch (error) {
+      console.error("Create chat message error:", error);
+      res.status(500).json({ message: "Failed to create chat message" });
+    }
+  });
+
+  // Notification routes
+  app.get("/api/notifications/:userId", async (req, res) => {
+    try {
+      const notifications = await storage.getNotificationsByUser(req.params.userId);
+      res.json(notifications);
+    } catch (error) {
+      console.error("Get notifications error:", error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+
+  app.get("/api/notifications/:userId/unread-count", async (req, res) => {
+    try {
+      const count = await storage.getUnreadNotificationCount(req.params.userId);
+      res.json({ count });
+    } catch (error) {
+      console.error("Get unread count error:", error);
+      res.status(500).json({ message: "Failed to fetch unread count" });
+    }
+  });
+
+  app.post("/api/notifications", async (req, res) => {
+    try {
+      const notification = await storage.createNotification(req.body);
+      res.json(notification);
+    } catch (error) {
+      console.error("Create notification error:", error);
+      res.status(500).json({ message: "Failed to create notification" });
+    }
+  });
+
+  app.patch("/api/notifications/:id/read", async (req, res) => {
+    try {
+      const notification = await storage.markNotificationAsRead(req.params.id);
+      if (!notification) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+      res.json(notification);
+    } catch (error) {
+      console.error("Mark notification as read error:", error);
+      res.status(500).json({ message: "Failed to mark notification as read" });
+    }
+  });
+
+  app.patch("/api/notifications/:userId/read-all", async (req, res) => {
+    try {
+      await storage.markAllNotificationsAsRead(req.params.userId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Mark all as read error:", error);
+      res.status(500).json({ message: "Failed to mark all notifications as read" });
+    }
+  });
+
+  // Ticket history routes
+  app.get("/api/ticket-history/:ticketId", async (req, res) => {
+    try {
+      const history = await storage.getTicketHistory(req.params.ticketId);
+      res.json(history);
+    } catch (error) {
+      console.error("Get ticket history error:", error);
+      res.status(500).json({ message: "Failed to fetch ticket history" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });

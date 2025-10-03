@@ -4,6 +4,30 @@
 
 SolarTech is a hybrid web application combining a marketing website for a solar energy company with an integrated customer support platform. The application features a public-facing solar company website with AI-powered chat assistance, alongside a comprehensive customer support system with ticketing, live chat, and user management capabilities. Built with React, Express, and MySQL, it serves residential and commercial solar customers with both marketing content and support tools.
 
+## Recent Changes (October 3, 2025)
+
+### Database Configuration
+- Converted from PostgreSQL (Neon) to MySQL/MariaDB
+- Updated Drizzle ORM configuration for MySQL dialect
+- Implemented lazy database connection for graceful degradation
+- External database: `5.181.218.15:3306` (requires IP whitelisting for Replit: 136.117.137.191)
+
+### API Implementation
+- Added complete REST API endpoints for Users, Tickets, Notifications, and Chat Messages
+- Implemented automatic notification creation on ticket events
+- Added ticket history tracking for audit trail
+- All API routes connected to database storage layer
+
+### Support System Features
+- ✅ Footer Support Buttons (Live Chat, AI Chat, WhatsApp, Email)
+- ✅ AI-powered chat with OpenAI integration (optional - gracefully degrades)
+- ✅ WebSocket live chat for real-time agent communication
+- ✅ File upload capability in chat and tickets
+- ✅ Multi-stage ticket system with priority and status tracking
+- ✅ User authentication and role-based access control
+- ✅ Notification system with push notifications
+- ✅ Admin portal with user management
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

@@ -15,7 +15,7 @@ import {
   notifications,
   ticketHistory,
 } from "@shared/schema";
-import { db } from "./db";
+import { getDB } from "./db";
 import { eq, desc, and } from "drizzle-orm";
 
 // Storage interface for all CRUD operations
@@ -56,30 +56,36 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   // User methods
   async getUser(id: string): Promise<User | undefined> {
+    const db = await getDB();
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
+    const db = await getDB();
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
+    const db = await getDB();
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    const db = await getDB();
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async getAllUsers(): Promise<User[]> {
+    const db = await getDB();
     return db.select().from(users);
   }
 
   async updateUserRole(id: string, role: string): Promise<User | undefined> {
+    const db = await getDB();
     const [user] = await db
       .update(users)
       .set({ role })
@@ -90,24 +96,29 @@ export class DatabaseStorage implements IStorage {
 
   // Ticket methods
   async getTicket(id: string): Promise<Ticket | undefined> {
+    const db = await getDB();
     const [ticket] = await db.select().from(tickets).where(eq(tickets.id, id));
     return ticket || undefined;
   }
 
   async getTicketsByUser(userId: string): Promise<Ticket[]> {
+    const db = await getDB();
     return db.select().from(tickets).where(eq(tickets.userId, userId)).orderBy(desc(tickets.createdAt));
   }
 
   async getAllTickets(): Promise<Ticket[]> {
+    const db = await getDB();
     return db.select().from(tickets).orderBy(desc(tickets.createdAt));
   }
 
   async createTicket(ticket: InsertTicket): Promise<Ticket> {
+    const db = await getDB();
     const [newTicket] = await db.insert(tickets).values(ticket).returning();
     return newTicket;
   }
 
   async updateTicketStatus(id: string, status: string, resolvedAt?: Date): Promise<Ticket | undefined> {
+    const db = await getDB();
     const [ticket] = await db
       .update(tickets)
       .set({ status, updatedAt: new Date(), resolvedAt })
@@ -117,6 +128,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateTicketAssignment(id: string, assignedTo: string | null): Promise<Ticket | undefined> {
+    const db = await getDB();
     const [ticket] = await db
       .update(tickets)
       .set({ assignedTo, updatedAt: new Date() })
@@ -126,6 +138,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateTicket(id: string, updates: Partial<InsertTicket>): Promise<Ticket | undefined> {
+    const db = await getDB();
     const [ticket] = await db
       .update(tickets)
       .set({ ...updates, updatedAt: new Date() })
@@ -136,6 +149,7 @@ export class DatabaseStorage implements IStorage {
 
   // Chat message methods
   async getChatMessagesByTicket(ticketId: string): Promise<ChatMessage[]> {
+    const db = await getDB();
     return db
       .select()
       .from(chatMessages)
@@ -144,12 +158,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
+    const db = await getDB();
     const [newMessage] = await db.insert(chatMessages).values(message).returning();
     return newMessage;
   }
 
   // Notification methods
   async getNotificationsByUser(userId: string): Promise<Notification[]> {
+    const db = await getDB();
     return db
       .select()
       .from(notifications)
@@ -158,6 +174,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUnreadNotificationCount(userId: string): Promise<number> {
+    const db = await getDB();
     const results = await db
       .select()
       .from(notifications)
@@ -166,11 +183,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createNotification(notification: InsertNotification): Promise<Notification> {
+    const db = await getDB();
     const [newNotification] = await db.insert(notifications).values(notification).returning();
     return newNotification;
   }
 
   async markNotificationAsRead(id: string): Promise<Notification | undefined> {
+    const db = await getDB();
     const [notification] = await db
       .update(notifications)
       .set({ isRead: true })
@@ -180,6 +199,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async markAllNotificationsAsRead(userId: string): Promise<void> {
+    const db = await getDB();
     await db
       .update(notifications)
       .set({ isRead: true })
@@ -188,6 +208,7 @@ export class DatabaseStorage implements IStorage {
 
   // Ticket history methods
   async getTicketHistory(ticketId: string): Promise<TicketHistory[]> {
+    const db = await getDB();
     return db
       .select()
       .from(ticketHistory)
@@ -196,6 +217,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createTicketHistory(history: InsertTicketHistory): Promise<TicketHistory> {
+    const db = await getDB();
     const [newHistory] = await db.insert(ticketHistory).values(history).returning();
     return newHistory;
   }
