@@ -1,18 +1,8 @@
 import { Link } from "wouter";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-  Home as HomeIcon,
-  Building2,
-  Wrench,
-  Battery,
-  CheckCircle2,
-  Sun,
   TrendingUp,
   Users,
   Award,
@@ -20,6 +10,9 @@ import {
   FileText,
   Lightbulb,
   Shield,
+  MessageSquare,
+  Phone,
+  HelpCircle,
 } from "lucide-react";
 import {
   Accordion,
@@ -30,18 +23,6 @@ import {
 import { FAQWidget } from "@/components/FAQWidget";
 
 export default function Home() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    ownHome: "yes"
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Quote form submitted:", formData);
-  };
 
   const whyChooseUs = [
     {
@@ -230,94 +211,43 @@ export default function Home() {
       </section>
 
       <section id="quote" className="py-20 bg-gradient-to-br from-secondary/5 to-primary/5">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-serif font-bold text-4xl mb-4">Elevate Your Energy: Premium Renewable Solutions for Homes & Businesses</h2>
-            <p className="text-xl text-muted-foreground">Get a free personalized quote</p>
-          </div>
-          <Card>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="font-serif font-bold text-4xl mb-4">Elevate Your Energy: Premium Renewable Solutions for Homes & Businesses</h2>
+          <p className="text-xl text-muted-foreground mb-8">Get instant support with our Quick Support system</p>
+          <Card className="max-w-3xl mx-auto">
             <CardContent className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <Label htmlFor="name">Your name</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Enter your name"
-                    required
-                    data-testid="input-name"
-                  />
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="text-center space-y-3">
+                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                    <MessageSquare className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-lg">AI Assistant</h3>
+                  <p className="text-sm text-muted-foreground">Get instant answers to your questions</p>
                 </div>
-                <div>
-                  <Label htmlFor="email">Your email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="Enter your email"
-                    required
-                    data-testid="input-email"
-                  />
+                <div className="text-center space-y-3">
+                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                    <Users className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-lg">Live Agent</h3>
+                  <p className="text-sm text-muted-foreground">Chat with our solar experts</p>
                 </div>
-                <div>
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="Enter your phone number"
-                    required
-                    data-testid="input-phone"
-                  />
+                <div className="text-center space-y-3">
+                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                    <Phone className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-lg">Request Callback</h3>
+                  <p className="text-sm text-muted-foreground">We'll call you at your preferred time</p>
                 </div>
-                <div>
-                  <Label htmlFor="address">Address</Label>
-                  <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    placeholder="Enter your address"
-                    required
-                    data-testid="input-address"
-                  />
-                </div>
-                <div>
-                  <Label>Do you own your own home?</Label>
-                  <RadioGroup
-                    value={formData.ownHome}
-                    onValueChange={(value) => setFormData({ ...formData, ownHome: value })}
-                    className="flex gap-4 mt-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="yes" id="yes" data-testid="radio-yes" />
-                      <Label htmlFor="yes" className="font-normal cursor-pointer">Yes</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="no" id="no" data-testid="radio-no" />
-                      <Label htmlFor="no" className="font-normal cursor-pointer">No</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  By clicking below, I authorize Green Power Solutions Inc. to call me and send pre-recorded messages and text messages to me about warranty products and services at the telephone number. I agree to our Terms of Service.
-                </p>
-                <Button type="submit" size="lg" className="w-full" data-testid="button-submit-quote">
-                  Submit Quote Request
-                </Button>
-              </form>
+              </div>
+              <p className="text-sm text-muted-foreground mt-8 mb-6">
+                Click the Quick Support button below to get started. Our AI will help you, or connect you with a live agent, request a callback, or submit a support ticket.
+              </p>
+              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <HelpCircle className="h-5 w-5 text-primary" />
+                <span>Look for the orange Quick Support button at the bottom right →</span>
+              </div>
             </CardContent>
           </Card>
-          <div className="text-center mt-8">
-            <p className="text-muted-foreground">
-              Have Questions?{" "}
-              <a href="#quote" className="text-primary hover:underline font-semibold">
-                Talk to one of our experts
-              </a>
-            </p>
-          </div>
         </div>
       </section>
 
