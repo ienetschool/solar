@@ -4,6 +4,34 @@
 
 Green Power Solutions is a hybrid web application that combines a marketing website for a solar energy company with an integrated customer support platform. It features a public-facing website with AI-powered chat assistance and a comprehensive customer support system including ticketing, live chat, and user management. Built with React, Express, and MySQL, the platform serves both residential and commercial solar customers in Guyana, offering marketing content and robust support tools. The project aims to provide an all-encompassing digital solution for the solar energy sector, enhancing customer engagement and streamlining support operations.
 
+## Recent Changes (October 3, 2025 - Latest)
+
+### Quick Support System Redesign
+- **Removed quote form** from home page and replaced with Quick Support call-to-action
+- **Enhanced Quick Support popup** with comprehensive features:
+  - AI-powered chat assistant with context-aware responses
+  - Seamless handoff to live agents
+  - Callback request system with reference number generation
+  - Ticket submission with file upload capability
+  - All features fully responsive and accessible from any page
+- **Reference Number System**:
+  - Callback requests generate unique 8-character reference numbers
+  - Support tickets generate unique 8-character reference numbers
+  - Reference numbers displayed prominently after submission
+  - All references tracked in database for future lookup
+- **File Upload System**:
+  - Tickets support multiple file attachments (images, PDFs, documents)
+  - 10MB per file limit with validation
+  - Files stored in public/uploads and tracked in database
+  - Support for: images (jpeg, jpg, png, gif), documents (pdf, doc, docx, txt, xls, xlsx)
+- **Notification Infrastructure**:
+  - Comprehensive notification service created (`server/notification-service.ts`)
+  - In-app notifications (fully functional)
+  - Email notification infrastructure (ready for SendGrid/AWS SES/Nodemailer integration)
+  - WhatsApp notification infrastructure (ready for Twilio/WhatsApp Business API integration)
+  - All notification points integrated in callback and ticket workflows
+  - Documentation provided for external service integration
+
 ## Recent Changes (October 2025)
 
 ### Rebranding to Green Power Solutions

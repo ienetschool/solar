@@ -151,9 +151,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/tickets", async (req, res) => {
     try {
-      const ticket = await storage.createTicket(req.body);
+      const { userEmail, userName, userPhone, ...ticketData } = req.body;
+      const ticket = await storage.createTicket(ticketData);
       
-      // Send comprehensive notifications
+      // Send comprehensive notifications with contact info
       const notificationService = getNotificationService(storage);
       await notificationService.notifyTicketCreation({
         ticketId: ticket.id,
@@ -162,9 +163,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description: ticket.description,
         category: ticket.category,
         priority: ticket.priority,
-        userEmail: req.body.userEmail,
-        userName: req.body.userName,
-        userPhone: req.body.userPhone,
+        userEmail: userEmail,
+        userName: userName,
+        userPhone: userPhone,
       });
 
       res.json(ticket);

@@ -32,6 +32,7 @@ export function TicketSubmissionTab() {
     priority: "medium",
     email: "",
     name: "",
+    phone: "",
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,7 +111,7 @@ export function TicketSubmissionTab() {
       const fileUrls = await uploadFiles(userId);
       setUploadingFiles(false);
 
-      // Create the ticket
+      // Create the ticket with contact info for guest users
       const ticketData = {
         userId: userId,
         title: formData.title,
@@ -118,6 +119,9 @@ export function TicketSubmissionTab() {
         category: formData.category,
         priority: formData.priority,
         files: fileUrls,
+        userEmail: user ? user.email : formData.email,
+        userName: user ? user.name : formData.name,
+        userPhone: user ? undefined : (formData.phone || undefined),
       };
 
       const res = await apiRequest("POST", "/api/tickets", ticketData);
@@ -173,11 +177,9 @@ export function TicketSubmissionTab() {
                       Use the email <strong>{formData.email}</strong> when creating your account to access this ticket and all future support requests.
                     </p>
                     <Link href="/login">
-                      <a>
-                        <Button variant="outline" size="sm" className="mt-2" data-testid="button-create-account">
-                          Create Account / Login
-                        </Button>
-                      </a>
+                      <Button variant="outline" size="sm" className="mt-2" data-testid="button-create-account">
+                        Create Account / Login
+                      </Button>
                     </Link>
                   </div>
                 </div>
@@ -190,7 +192,7 @@ export function TicketSubmissionTab() {
             setSubmitted(false);
             setReferenceNumber("");
             setFiles([]);
-            setFormData({ title: "", description: "", category: "", priority: "medium", email: "", name: "" });
+            setFormData({ title: "", description: "", category: "", priority: "medium", email: "", name: "", phone: "" });
           }} 
           variant="outline"
           data-testid="button-submit-another"
@@ -247,6 +249,18 @@ export function TicketSubmissionTab() {
                   data-testid="input-ticket-email"
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="guest-ticket-phone">Phone Number (Optional)</Label>
+              <Input
+                id="guest-ticket-phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="(555) 123-4567"
+                data-testid="input-ticket-phone"
+              />
             </div>
           </>
         )}
