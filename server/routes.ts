@@ -341,12 +341,14 @@ Be professional, knowledgeable, and helpful. Encourage users to schedule a free 
 
         if (message.type === 'join') {
           clientId = message.userId;
-          clients.set(clientId, {
-            ws,
-            userId: message.userId,
-            username: message.username,
-            isAgent: message.isAgent || false,
-          });
+          if (clientId) {
+            clients.set(clientId, {
+              ws,
+              userId: message.userId,
+              username: message.username,
+              isAgent: message.isAgent || false,
+            });
+          }
 
           if (message.isAgent) {
             // Notify all customers that an agent joined
