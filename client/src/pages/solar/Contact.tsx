@@ -1,16 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail, Phone, MapPin, Upload, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Upload, Send, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CreateTicketDialog } from "@/components/CreateTicketDialog";
 import { SupportButtons } from "@/components/solar/SupportButtons";
+import { FAQWidget } from "@/components/FAQWidget";
+import { Badge } from "@/components/ui/badge";
 
 export default function Contact() {
+  const [location] = useLocation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,7 +23,35 @@ export default function Contact() {
     message: "",
   });
   const [ticketDialogOpen, setTicketDialogOpen] = useState(false);
+  const [contextSuggestion, setContextSuggestion] = useState("");
   const { toast } = useToast();
+
+  useEffect(() => {
+    detectPageContext();
+  }, [location]);
+
+  const detectPageContext = async () => {
+    try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const refPage = searchParams.get('ref') || location;
+      
+      const response = await fetch(`/api/context?page=${refPage}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.suggestion) {
+          setContextSuggestion(data.suggestion);
+        }
+        if (data.service && !formData.service) {
+          setFormData(prev => ({ ...prev, service: data.service }));
+        }
+        if (data.message && !formData.message) {
+          setFormData(prev => ({ ...prev, message: data.message }));
+        }
+      }
+    } catch (error) {
+      console.error("Failed to detect page context:", error);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,9 +77,22 @@ export default function Contact() {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Send us a message</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  Send us a message
+                  {contextSuggestion && (
+                    <Badge variant="outline" className="gap-1">
+                      <Sparkles className="h-3 w-3" />
+                      AI Pre-filled
+                    </Badge>
+                  )}
+                </CardTitle>
                 <CardDescription>
                   Fill out the form below and our team will respond within 24 hours
+                  {contextSuggestion && (
+                    <span className="block mt-1 text-primary font-medium">
+                      {contextSuggestion}
+                    </span>
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -220,6 +265,10 @@ export default function Contact() {
       </div>
 
       <CreateTicketDialog open={ticketDialogOpen} onOpenChange={setTicketDialogOpen} />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <FAQWidget />
+      </div>
     </div>
   );
 }

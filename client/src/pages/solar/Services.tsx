@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, Home, Building2, Wrench, Battery, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
+import { FAQWidget } from "@/components/FAQWidget";
 
 export default function Services() {
   const services = [
@@ -126,6 +127,8 @@ export default function Services() {
             </Link>
           </CardContent>
         </Card>
+
+        <FAQWidget />
       </div>
     </div>
   );
